@@ -8,6 +8,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/sensor', function (Request $request) {
-    dump($request->all());
+    
     return $request->all();
 });
