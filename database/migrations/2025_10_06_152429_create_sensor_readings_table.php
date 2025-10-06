@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Sensor;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,8 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('soil_moistures', function (Blueprint $table) {
+        Schema::create('sensor_readings', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(Sensor::class);
+            // $table->geography('coordinates', 'point');
+            $table->float("longitude");
+            $table->float("latitude");
+            $table->integer('moisture');
             $table->timestamps();
         });
     }
@@ -22,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('soil_moistures');
+        Schema::dropIfExists('sensor_readings');
     }
 };

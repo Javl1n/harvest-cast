@@ -1,9 +1,16 @@
 import Map from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useAppearance } from '@/hooks/use-appearance';
+import { usePage } from '@inertiajs/react';
+import { SensorInterface, SharedData } from '@/types';
+import { useState } from 'react';
+import Sensors from './sensors';
+
+
 
 export default function AppMap() {
      const { appearance, updateAppearance } = useAppearance();
+     const [longitude, latitude] = [125.077261, 6.219394];
 
      const style = {
           'light' : 'satellite-v9',
@@ -16,8 +23,8 @@ export default function AppMap() {
           <Map
                mapboxAccessToken={import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}
                initialViewState={{
-                    longitude: 125.077261,
-                    latitude: 6.219394,
+                    longitude: longitude,
+                    latitude: latitude,
                     zoom: 14
                }}
                style={{
@@ -25,7 +32,9 @@ export default function AppMap() {
                     height: "100%"
                }}
                mapStyle={`mapbox://styles/mapbox/${style[appearance]}`}
-          />
+          >
+               <Sensors />
+          </Map>    
      )
 }
 

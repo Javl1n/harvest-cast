@@ -19,7 +19,7 @@ export default ({ children, breadcrumbs, hidden = false, ...props }: AppLayoutPr
                 </div>
             }
             <div>
-                <SidebarTrigger className='bg-background absolute top-2 right-2 z-50' />
+                <SidebarTrigger className='bg-sidebar absolute top-2 right-2 z-50' />
             </div>
             <AppMap />
         </div>

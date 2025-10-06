@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SoilMoisture>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Sensor>
  */
-class SoilMoistureFactory extends Factory
+class SensorFactory extends Factory
 {
     /**
      * Define the model's default state.
