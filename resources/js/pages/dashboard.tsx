@@ -1,3 +1,4 @@
+import { useSetPanelSize } from '@/hooks/use-set-panel-size';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -10,11 +11,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard() {
+const Dashboard = () => {
 
     return (
-        <AppLayout hidden breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Dashboard" />
-        </AppLayout>
+        </>
     );
 }
+
+Dashboard.layout = (page: any) => <AppLayout hidden children={page} breadcrumbs={breadcrumbs} />
+
+export default Dashboard;

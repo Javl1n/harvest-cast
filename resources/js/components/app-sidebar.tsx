@@ -7,11 +7,12 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Calendar, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
+import calendar from '@/routes/calendar';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
+        title: 'Calendar',
+        href: calendar.index(),
         icon: Calendar,
     },
 ];

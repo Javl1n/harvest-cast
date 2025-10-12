@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CropPricesController;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\SensorReadingController;
 use Illuminate\Http\Request;
@@ -21,6 +22,14 @@ Route::prefix('/sensors')
     });
     
     Route::controller(SensorReadingController::class)->group(function () {
+        Route::post('/data', 'store');
+    });
+});
+
+
+Route::prefix('/crops')
+->group(function () {
+    Route::controller(CropPricesController::class)->group(function () {
         Route::post('/data', 'store');
     });
 });

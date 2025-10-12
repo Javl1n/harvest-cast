@@ -1,18 +1,15 @@
 import { SensorInterface, SharedData } from "@/types";
 import { usePage } from "@inertiajs/react";
 import { useEffect, useMemo, useState } from "react";
-import SensorMarker from "./sensor-markers";
+import SensorMarker, { SensorMarkerInterface } from "./sensor-markers";
 import { Layer, Point, Source } from "react-map-gl/mapbox";
 import { features } from "process";
 import { useEcho, useEchoPublic } from "@laravel/echo-react";
 
-interface SensorsObject {
-     [key: string]: {
-          uuid: string;
-          longitude: number;
-          latitude: number;
-          moisture: number;
-     };
+
+
+export interface SensorsObject {
+     [key: string]: SensorMarkerInterface;
 }
 
 export default function Sensors() {
@@ -63,11 +60,9 @@ export default function Sensors() {
      return(
           <>
                {Object.values(sensors).map((sensor) => (
-                    <SensorMarker 
+                    <SensorMarker
                          key={sensor.uuid}
-                         longitude={sensor.longitude}
-                         latitude={sensor.latitude}
-                         moisture={sensor.moisture}
+                         sensor={sensor}
                     />
                ))}
           </>

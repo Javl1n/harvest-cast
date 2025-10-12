@@ -19,5 +19,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admin@gmail.com',
         ]);
+
+        $this->call([
+            CommoditySeeder::class,
+        ]);
     }
 }
