@@ -12,7 +12,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const Dashboard = () => {
-
+    useSetPanelSize(0);
     return (
         <>
             <Head title="Dashboard" />

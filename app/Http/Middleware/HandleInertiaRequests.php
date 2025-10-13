@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Sensor;
+use App\Models\Weather;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -46,6 +47,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'weather' => Weather::latest()->first()?->decoded_info ?? null,
             'sensors' => Sensor::with('latestReading')->get(), 
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

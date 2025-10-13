@@ -27,4 +27,14 @@ class Sensor extends Model
     {
         return $this->hasOne(SensorReading::class, 'sensor_id')->oldestOfMany();
     }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'sensor_id');
+    }
+
+    public function latestSchedule()
+    {
+        return $this->hasOne(Schedule::class, 'sensor_id')->latestOfMany();
+    }
 }

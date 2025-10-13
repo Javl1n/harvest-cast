@@ -25,30 +25,29 @@ class CommoditySeeder extends Seeder
                 "Grits White, Food Grade",
                 "Grits Yellow, Food Grade",
                 "Cracked Yellow, Food Grade",
-                "Cracked Yellow, Feed Grade",
                 "Grits, Feed Grade"
             ],
             "Ampalaya" => [
-                "Ampalaya",
+                // "Ampalaya",
                 "4-5 pcs/kg"
             ],
             "Eggplant" => [
-                "Eggplant",
+                // "Eggplant",
                 "3-4 Small Bundles"
             ],
             "Pechay" => [
-                "Native Pechay, 3-4 Small Bundles",
+                "3-4 Small Bundles",
+            ],
+            "Pechay Baguio" => [
                 "Pechay Baguio"
             ],
             "Pole Sitao" => [
-                "Pole Sitao",
                 "3-4 Small Bundles"
             ],
             "Squash" => [
                 "Suprema Variety"
             ],
             "Tomato" => [
-                "Tomato",
                 "15-18 pcs/kg"
             ],
             "Bell Pepper" => [
@@ -56,11 +55,9 @@ class CommoditySeeder extends Seeder
                 "Red, Local Medium (151-250gm/pc)"
             ],
             "Broccoli" => [
-                "Broccoli",
                 "Local Medium (8-10 cm diameter/bunch hd)"
             ],
             "Cauliflower" => [
-                "Cauliflower",
                 "Local Medium (8-10 cm diameter/bunch hd)"
             ],
             "Cabbage" => [
@@ -69,15 +66,12 @@ class CommoditySeeder extends Seeder
                 "Wonder Ball, 510 gm - 1 kg/head"
             ],
             "Carrots" => [
-                "Carrots",
                 "Local 8-10 pcs/kg"
             ],
             "Celery" => [
-                "Celery",
                 "Medium (501-800 g)"
             ],
             "Chayote" => [
-                "Chayote",
                 "Medium (301-400 g)"
             ],
             "Habichuelas/Baguio Beans" => [
@@ -89,7 +83,6 @@ class CommoditySeeder extends Seeder
                 "Romaine"
             ],
             "White Potato" => [
-                "White Potato",
                 "Local 10-12 pcs/kg"
             ],
         ];

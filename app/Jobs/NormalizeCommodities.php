@@ -18,9 +18,12 @@ class NormalizeCommodities implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public string $prompt
+        public string $prompt,
+        public string $date
     )
-    {}
+    {
+        $this->onQueue('normalizing');
+    }
 
     /**
      * Execute the job.
@@ -28,7 +31,7 @@ class NormalizeCommodities implements ShouldQueue
     public function handle(): void
     {
         $response = Prism::text()
-        ->using(Provider::OpenAI, 'gpt-5-mini')
+        ->using(Provider::OpenAI, 'gpt-5-nano')
         ->withSystemPrompt($this->buildSystemPrompt())
         ->withPrompt($this->prompt)
         ->withMaxTokens(12000)
@@ -40,7 +43,7 @@ class NormalizeCommodities implements ShouldQueue
 
         $array = json_decode($response->text, true);
         
-        SavePrices::dispatch($array);
+        SavePrices::dispatch($array, $this->date);
     }
 
     private function buildSystemPrompt()
@@ -75,10 +78,10 @@ class NormalizeCommodities implements ShouldQueue
         $prompt .= json_encode($standardCommodities, JSON_PRETTY_PRINT);
 
         $prompt .= <<<PROMPT
-        5. If a record's commodity name includes additional descriptive keywords not found among existing variants (e.g., “Pechay Tagalog” when only “Pechay Baguio” exists), create a new variant under the same commodity using those keywords. If the record's name has no extra descriptive keywords, use the base commodity name as its variant (e.g., “Pechay” → variant = “Pechay”).
-        6. Only return valid local data.
-        7. Keep the output format strictly as a JSON array.
-        8. Ignore these categories: Spices, Other Commodities, Beef Meat Products, Fish Products, Pork Meat Products, Other Livestock Products, Poultry Products.
+        
+        5. Only return valid local data.
+        6. Keep the output format strictly as a JSON array.
+        7. Ignore these categories: Spices, Other Commodities, Beef Meat Products, Fish Products, Pork Meat Products, Other Livestock Products, Poultry Products.
 
         ### OUTPUT FORMAT
         [
@@ -89,6 +92,8 @@ class NormalizeCommodities implements ShouldQueue
             }
         ]
         PROMPT;
+
+        // 5. If a record's commodity name includes additional descriptive keywords not found among existing variants (e.g., “Pechay Tagalog” when only “Pechay Baguio” exists), create a new variant under the same commodity using those keywords. If the record's name has no extra descriptive keywords, use the base commodity name as its variant (e.g., “Pechay” → variant = “Pechay”).
 
         return $prompt;
     }

@@ -5,29 +5,35 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard, home } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Calendar, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Calendar, CircleDot, Folder, LayoutGrid, TrendingUp } from 'lucide-react';
 import AppLogo from './app-logo';
-import calendar from '@/routes/calendar';
+import sensors from '@/routes/sensors';
+import pricingForecast from '@/routes/pricing-forecast';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Calendar',
-        href: calendar.index(),
-        icon: Calendar,
+        title: 'Sensors',
+        href: sensors.index(),
+        icon: CircleDot,
+    },
+    {
+        title: 'Pricing Forecast',
+        href: pricingForecast.index(),
+        icon: TrendingUp,
     },
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+    // {
+    //     title: 'Repository',
+    //     href: 'https://github.com/laravel/react-starter-kit',
+    //     icon: Folder,
+    // },
+    // {
+    //     title: 'Documentation',
+    //     href: 'https://laravel.com/docs/starter-kits#react',
+    //     icon: BookOpen,
+    // },
 ];
 
 export function AppSidebar() {

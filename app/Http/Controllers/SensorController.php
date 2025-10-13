@@ -13,9 +13,9 @@ class SensorController extends Controller
      */
     public function index()
     {
-        // $sensors = Sensor::with('latestReading')->get();
-
-        // return response()->;
+        return inertia()->render('sensors/index', [
+            // 'sensors' => Sensor::all()->load('latestReading'),
+        ]);
     }
 
     /**
@@ -64,7 +64,9 @@ class SensorController extends Controller
      */
     public function show(Sensor $sensor)
     {
-        //
+        return inertia()->render('sensors/show', [
+            'sensor' => $sensor->load('readings', 'latestReading', 'schedules')
+        ]);
     }
 
     /**

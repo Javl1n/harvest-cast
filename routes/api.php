@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarPageController;
 use App\Http\Controllers\CropPricesController;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\SensorReadingController;
@@ -31,5 +32,9 @@ Route::prefix('/crops')
 ->group(function () {
     Route::controller(CropPricesController::class)->group(function () {
         Route::post('/data', 'store');
+    });
+    
+    Route::controller(CalendarPageController::class)->group(function () {
+        Route::get('/recommendations/{sensor}', 'recommendations');
     });
 });

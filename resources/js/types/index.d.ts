@@ -28,6 +28,7 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     sensors: SensorInterface[];
+    weather: WeatherInterface;
     [key: string]: unknown;
 }
 
@@ -62,4 +63,64 @@ export interface SensorReadingInterface {
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
+}
+
+export interface WeatherInterface {
+    [key: string]: any;
+}
+
+export interface CommodityInterface {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    variants?: CommodityVariantInterface[];
+}
+
+export interface CommodityVariantInterface {
+    id: number;
+    commodity_id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ScheduleInterface {
+    id: number;
+    commodity_id: number;
+    sensor_id: string;
+    hectares: number;
+    seeds_planted: number;
+    date_planted: string;
+    expected_harvest_date?: string;
+    actual_harvest_date?: string;
+    yield?: number;
+    expected_income: number;
+    income?: number;
+    created_at: string;
+    updated_at: string;
+    commodity?: CommodityInterface;
+    sensor?: SensorInterface;
+}
+
+export interface CropRecommendation {
+    crop: string;
+    variety: string;
+    score: number;
+    suitability: 'excellent' | 'good' | 'fair' | 'poor' | 'unsuitable';
+    reasons: string[];
+    planting_tips: string;
+    harvest_time: string;
+    harvest_days: number;
+    optimal_conditions: string;
+    water_requirements: string;
+}
+
+export interface CurrentConditions {
+    soil_moisture: number;
+    temperature?: number;
+    weather_condition?: string;
+    humidity?: number;
+    reading_date: string;
+    weather_date?: string;
 }

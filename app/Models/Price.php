@@ -10,6 +10,6 @@ class Price extends Model
 
     public function variant()
     {
-        $this->belongsTo(CommodityVariant::class, 'variant_id');
+        return $this->belongsTo(CommodityVariant::class, 'variant_id');
     }
 }

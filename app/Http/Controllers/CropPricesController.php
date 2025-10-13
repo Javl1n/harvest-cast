@@ -4,13 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Jobs\NormalizeCommodities;
 use App\Models\Commodity;
+use App\Models\Price;
 use Illuminate\Http\Request;
 
 class CropPricesController extends Controller
 {
     public function store(Request $request)
     {
-        $request->validate(['data' => 'required|array']);
+        $request->validate([
+            'data' => 'required|array',
+            'date' => 'nullable|date|date_format:Y-m-d',
+            'force' => 'nullable|boolean'
+        ]);
+
+        // Use provided date or default to today
+        $date = $request->date ?? now()->format('Y-m-d');
+
+        // Check if there are already price records for this date (unless forced)
+        $force = $request->boolean('force', false);
+        
+        if (!$force) {
+            $existingPricesCount = Price::whereDate('date', $date)->count();
+            
+            if ($existingPricesCount > 0) {
+                return response()->json([
+                    'message' => 'Price records already exist for this date. Use "force: true" to override.',
+                    'date' => $date,
+                    'existing_records_count' => $existingPricesCount,
+                    'skipped' => true
+                ], 200);
+            }
+        }
 
         $records = collect($request->data)->filter(function (array $value, int $key) {
 
@@ -20,8 +44,8 @@ class CropPricesController extends Controller
                 'Pork Meat Products', 
                 'Products', 
                 'Poultry Products',
-                'Lowland Vegetables',
-                'Highland Vegetables',
+                // 'Lowland Vegetables',
+                // 'Highland Vegetables',
                 'Spices', 
                 'Fruits', 
                 'Other Basic Commodities'
@@ -41,8 +65,13 @@ class CropPricesController extends Controller
 
         // dump($prompt);
 
-        NormalizeCommodities::dispatch($prompt);
+        NormalizeCommodities::dispatch($prompt, $date);
 
-        return response()->json(['message' => 'Normalization Started']);
+        return response()->json([
+            'message' => 'Normalization Started',
+            'date' => $date,
+            'records_count' => count($records),
+            'forced' => $force
+        ]);
     }
 }

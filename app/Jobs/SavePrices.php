@@ -15,9 +15,12 @@ class SavePrices implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public array $commodities
+        public array $commodities,
+        public string $date
     )
-    {}
+    {
+        $this->onQueue('saving');
+    }
 
     /**
      * Execute the job.
@@ -25,14 +28,28 @@ class SavePrices implements ShouldQueue
     public function handle(): void
     {
         foreach ($this->commodities as $item) {
-            $commodity = Commodity::where('name', $item['commodity'])->first();
+            // Skip if essential data is missing
+            if (empty($item['commodity']) || empty($item['variant']) || !isset($item['price'])) {
+                continue;
+            }
 
-            $commodity->variants()->firstOrCreate([
-                'name' => $item['variant']
-            ])->prices()->updateOrCreate([
-                'date' => now('Asia/Manila')->format("Y-m-d"),
-            ],[
-                "price" => $item['price'],
+            // Find the commodity (skip if it doesn't exist)
+            $commodity = Commodity::where('name', trim($item['commodity']))->first();
+            if (!$commodity) {
+                continue; // Skip this item if commodity doesn't exist
+            }
+
+            // Find the variant (skip if it doesn't exist)
+            $variant = $commodity->variants()->where('name', trim($item['variant']))->first();
+            if (!$variant) {
+                continue; // Skip this item if variant doesn't exist
+            }
+
+            // Update or create the price for the existing variant
+            $variant->prices()->updateOrCreate([
+                'date' => $this->date,
+            ], [
+                'price' => $item['price'],
             ]);
         }
     }
