@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Commodity;
+use App\Models\CropRecommendation;
 use App\Models\Schedule;
 use App\Models\Sensor;
 use App\Models\Weather;
@@ -78,7 +79,6 @@ class CalendarPageController extends Controller
             'seeds_planted' => 'required|integer|min:1',
             'date_planted' => 'required|date',
             'expected_harvest_date' => 'required|date|after:date_planted',
-            'expected_income' => 'required|numeric|min:0',
         ]);
 
         $schedule = Schedule::create($validated);

@@ -22,7 +22,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CommoditySeeder::class,
-            // PriceSeeder::class,
+            PriceSeeder::class,
+            WeatherSeeder::class,
+            CropRecommendationSeeder::class,
         ]);
     }
 }

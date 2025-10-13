@@ -96,3 +96,6 @@ class CommoditySeeder extends Seeder
         }
     }
 }
+
+
+// "Rice", "Corn", "Ampalaya", "Eggplant", "Pechay", "Pechay Baguio", "Pole Sitao", "Squash", "Tomato", "Bell Pepper", "Broccoli", "Cauliflower", "Cabbage", "Carrots", "Celery", "Chayote", "Habichuelas/Baguio Beans", "Lettuce", "White Potato"

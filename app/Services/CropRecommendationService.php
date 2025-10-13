@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CropRecommendation;
 use App\Models\Weather;
 use App\Models\SensorReading;
 use Carbon\Carbon;
@@ -24,23 +25,23 @@ class CropRecommendationService
         
         $recommendations = [];
         
-        // Get corn and rice data
-        $crops = $this->getCropDatabase();
+        // Get active crop recommendations from database
+        $crops = CropRecommendation::active()->with('commodity')->get();
         
         foreach ($crops as $crop) {
             $score = $this->calculateCropScore($crop, $soilMoisture, $season, $month, $temperature, $humidity, $weatherCondition);
             
             $recommendations[] = [
-                'crop' => $crop['name'],
-                'variety' => $crop['variety'],
+                'crop' => $crop->commodity->name,
+                'variety' => $crop->commodity->variants->first()?->name ?? 'Standard',
                 'score' => $score,
                 'suitability' => $this->getSuitabilityLevel($score),
                 'reasons' => $this->getRecommendationReasons($crop, $soilMoisture, $season, $temperature),
-                'planting_tips' => $crop['planting_tips'],
-                'harvest_time' => $crop['harvest_time'],
-                'harvest_days' => $crop['harvest_days'],
-                'optimal_conditions' => $crop['optimal_conditions'],
-                'water_requirements' => $crop['water_requirements']
+                'planting_tips' => $crop->planting_tips,
+                'harvest_time' => $crop->harvest_time,
+                'harvest_days' => $crop->harvest_days,
+                'optimal_conditions' => $crop->optimal_conditions,
+                'water_requirements' => $crop->water_requirements
             ];
         }
         
@@ -53,24 +54,24 @@ class CropRecommendationService
     /**
      * Calculate a suitability score for a crop (0-100)
      */
-    private function calculateCropScore(array $crop, int $soilMoisture, string $season, int $month, ?float $temperature, ?int $humidity, ?string $weatherCondition): int
+    private function calculateCropScore(CropRecommendation $crop, int $soilMoisture, string $season, int $month, ?float $temperature, ?int $humidity, ?string $weatherCondition): int
     {
         $score = 0;
         
         // Soil moisture scoring (40 points max)
-        $moistureScore = $this->scoreMoisture($soilMoisture, $crop['moisture_range']);
+        $moistureScore = $this->scoreMoisture($soilMoisture, $crop->moisture_range);
         $score += $moistureScore * 0.4;
         
         // Season scoring (30 points max)
-        $seasonScore = in_array($season, $crop['seasons']) ? 30 : 0;
-        if (in_array($month, $crop['planting_months'])) {
+        $seasonScore = in_array($season, $crop->seasons) ? 30 : 0;
+        if (in_array($month, $crop->planting_months)) {
             $seasonScore += 10; // Bonus for optimal planting month
         }
         $score += $seasonScore;
         
         // Temperature scoring (20 points max)
         if ($temperature !== null) {
-            $tempScore = $this->scoreTemperature($temperature, $crop['temperature_range']);
+            $tempScore = $this->scoreTemperature($temperature, $crop->temperature_range);
             $score += $tempScore * 0.2;
         } else {
             $score += 15; // Default score if no temperature data
@@ -78,9 +79,9 @@ class CropRecommendationService
         
         // Weather condition bonus/penalty (10 points max)
         if ($weatherCondition !== null) {
-            if (in_array($weatherCondition, $crop['favorable_weather'])) {
+            if (in_array($weatherCondition, $crop->favorable_weather)) {
                 $score += 10;
-            } elseif (in_array($weatherCondition, $crop['unfavorable_weather'])) {
+            } elseif (in_array($weatherCondition, $crop->unfavorable_weather)) {
                 $score -= 5;
             } else {
                 $score += 5; // Neutral weather
@@ -175,12 +176,12 @@ class CropRecommendationService
     /**
      * Get reasons for recommendation
      */
-    private function getRecommendationReasons(array $crop, int $soilMoisture, string $season, ?float $temperature): array
+    private function getRecommendationReasons(CropRecommendation $crop, int $soilMoisture, string $season, ?float $temperature): array
     {
         $reasons = [];
         
-        $moistureMin = $crop['moisture_range']['min'];
-        $moistureMax = $crop['moisture_range']['max'];
+        $moistureMin = $crop->moisture_range['min'];
+        $moistureMax = $crop->moisture_range['max'];
         
         if ($soilMoisture >= $moistureMin && $soilMoisture <= $moistureMax) {
             $reasons[] = "Ideal soil moisture level ({$soilMoisture}%)";
@@ -190,15 +191,15 @@ class CropRecommendationService
             $reasons[] = "High soil moisture - ensure proper drainage";
         }
         
-        if (in_array($season, $crop['seasons'])) {
+        if (in_array($season, $crop->seasons)) {
             $reasons[] = "Perfect season for planting ({$season})";
         } else {
             $reasons[] = "Off-season planting - consider greenhouse or climate control";
         }
         
         if ($temperature !== null) {
-            $tempMin = $crop['temperature_range']['min'];
-            $tempMax = $crop['temperature_range']['max'];
+            $tempMin = $crop->temperature_range['min'];
+            $tempMax = $crop->temperature_range['max'];
             
             if ($temperature >= $tempMin && $temperature <= $tempMax) {
                 $reasons[] = "Optimal temperature range ({$temperature}°C)";
@@ -210,44 +211,5 @@ class CropRecommendationService
         }
         
         return $reasons;
-    }
-    
-    /**
-     * Crop database for corn and rice only
-     */
-    private function getCropDatabase(): array
-    {
-        return [
-            [
-                'name' => 'Rice',
-                'variety' => 'Lowland Rice',
-                'moisture_range' => ['min' => 80, 'max' => 100],
-                'temperature_range' => ['min' => 20, 'max' => 35],
-                'seasons' => ['summer', 'spring'],
-                'planting_months' => [4, 5, 6, 7],
-                'favorable_weather' => ['Clear', 'Clouds', 'Rain'],
-                'unfavorable_weather' => ['Thunderstorm'],
-                'planting_tips' => 'Requires flooded fields. Plant seedlings in puddled soil. Maintain 2-5cm water depth.',
-                'harvest_time' => '120-150 days',
-                'harvest_days' => 135, // Average of 120-150
-                'optimal_conditions' => 'Flooded fields with warm temperatures and high humidity',
-                'water_requirements' => 'Very High - requires continuous flooding'
-            ],
-            [
-                'name' => 'Corn',
-                'variety' => 'Field Corn (Dent)',
-                'moisture_range' => ['min' => 50, 'max' => 70],
-                'temperature_range' => ['min' => 18, 'max' => 32],
-                'seasons' => ['summer', 'spring'],
-                'planting_months' => [4, 5, 6],
-                'favorable_weather' => ['Clear', 'Clouds'],
-                'unfavorable_weather' => ['Thunderstorm'],
-                'planting_tips' => 'Plant when soil temperature reaches 10°C. Space rows 75cm apart. Plant 2-3cm deep.',
-                'harvest_time' => '90-120 days',
-                'harvest_days' => 105, // Average of 90-120
-                'optimal_conditions' => 'Well-drained soil with warm temperatures and moderate rainfall',
-                'water_requirements' => 'Moderate - requires consistent moisture during grain filling'
-            ]
-        ];
     }
 }

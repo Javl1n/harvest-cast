@@ -8003,16 +8003,16 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v1.3.1",
+            "version": "v1.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "9fa82d573483b0354a036e2e31840699aeaf2347"
+                "reference": "b286bfaa1aac723c7e5589d0ffa6561c097def28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/9fa82d573483b0354a036e2e31840699aeaf2347",
-                "reference": "9fa82d573483b0354a036e2e31840699aeaf2347",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/b286bfaa1aac723c7e5589d0ffa6561c097def28",
+                "reference": "b286bfaa1aac723c7e5589d0ffa6561c097def28",
                 "shasum": ""
             },
             "require": {
@@ -8065,7 +8065,7 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2025-10-13T07:36:37+00:00"
+            "time": "2025-10-13T10:14:41+00:00"
         },
         {
             "name": "laravel/pail",

@@ -33,7 +33,6 @@ const CropCreate = () => {
         seeds_planted: '',
         date_planted: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
         expected_harvest_date: '',
-        expected_income: '',
     });
 
     const handleRecommendationSelect = (crop: string, commodityId: number, harvestDays: number) => {
@@ -192,21 +191,6 @@ const CropCreate = () => {
                                 />
                                 <InputError message={errors.expected_harvest_date} />
                             </div>
-                        </div>
-
-                        <div className="space-y-1">
-                            <Label htmlFor="expected_income" className="text-sm">Expected Income (₱) *</Label>
-                            <Input
-                                id="expected_income"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                placeholder="e.g., 50000.00"
-                                value={data.expected_income}
-                                onChange={(e) => setData('expected_income', e.target.value)}
-                                className={`text-sm ${errors.expected_income ? 'border-destructive' : ''}`}
-                            />
-                            <InputError message={errors.expected_income} />
                         </div>
                     </div>
 
