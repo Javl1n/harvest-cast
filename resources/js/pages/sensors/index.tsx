@@ -1,7 +1,6 @@
 import { useSetPanelSize } from '@/hooks/use-set-panel-size';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import sensors from '@/routes/sensors';
 import calendar from '@/routes/calendar';
 import { SensorInterface, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -13,7 +12,7 @@ import { useState, useMemo } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
      {
-          title: 'Sensor Calendar',
+          title: 'Calendar',
           href: calendar.index().url,
      },
 ];
@@ -22,7 +21,7 @@ const SensorsIndex = () => {
           sensors: SensorInterface[];
      }>().props;
 
-     useSetPanelSize(50);
+     useSetPanelSize(30);
 
      // Count sensors by status
      const activePlantingsCount = useMemo(() => {

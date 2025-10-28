@@ -12,7 +12,7 @@ import pricingForecast from '@/routes/pricing-forecast';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Sensor Calendar',
+        title: 'Calendar',
         href: calendar.index(),
         icon: Calendar,
     },

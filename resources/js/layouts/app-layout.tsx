@@ -9,6 +9,7 @@ import { usePage } from '@inertiajs/react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { ImperativePanelGroupHandle } from 'react-resizable-panels';
+import { AppSidebarHeader } from '@/components/app-sidebar-header';
 
 interface AppLayoutProps {
     children?: ReactNode;
@@ -47,7 +48,7 @@ export default ({ children, breadcrumbs, hidden = false, ...props }: AppLayoutPr
 
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-            <div className="h-full w-full">
+            <div className="h-full w-full hidden lg:block">
                 <ResizablePanelGroup 
                     ref={panelGroupRef}
                     direction='horizontal' 
@@ -68,7 +69,11 @@ export default ({ children, breadcrumbs, hidden = false, ...props }: AppLayoutPr
                     </div>
                     <SidebarTrigger className='bg-card/95 pointer-events-auto' />
                 </div>
-                <AppMap />
+                <AppMap  />
+            </div>
+            <div className='lg:hidden'>
+                <AppSidebarHeader breadcrumbs={breadcrumbs} />
+                {children}
             </div>
         </AppLayoutTemplate>
     );

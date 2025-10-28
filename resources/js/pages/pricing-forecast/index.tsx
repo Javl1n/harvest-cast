@@ -73,29 +73,31 @@ const CHART_COLORS = [
 
 // Loading skeleton component
 const LoadingSkeleton = () => (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
         {[1, 2].map((commodityIndex) => (
-            <div key={commodityIndex} className="bg-card rounded-lg border p-6">
-                <div className="flex items-center gap-3 mb-6">
-                    <Skeleton className="h-6 w-6 rounded" />
-                    <Skeleton className="h-6 w-48" />
+            <div key={commodityIndex} className="bg-card rounded-lg border p-4 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <Skeleton className="h-5 w-5 sm:h-6 sm:w-6 rounded" />
+                    <Skeleton className="h-5 sm:h-6 w-32 sm:w-48" />
                 </div>
 
                 {/* Chart skeleton */}
-                <div className="mb-8">
-                    <Skeleton className="h-5 w-32 mb-4" />
-                    <Skeleton className="h-[400px] w-full rounded-lg" />
+                <div className="mb-6 sm:mb-8 -mx-4 sm:mx-0">
+                    <Skeleton className="h-4 sm:h-5 w-24 sm:w-32 mb-3 sm:mb-4 mx-4 sm:mx-0" />
+                    <div className="overflow-x-auto">
+                        <Skeleton className="h-[250px] sm:h-[350px] lg:h-[400px] w-full rounded-lg" />
+                    </div>
                 </div>
 
                 {/* Variant cards skeleton */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {[1, 2, 3].map((variantIndex) => (
-                        <div key={variantIndex} className="bg-background rounded-lg border p-4 space-y-3">
-                            <Skeleton className="h-5 w-32" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-3/4" />
-                            <div className="space-y-2 pt-3">
-                                <Skeleton className="h-3 w-20" />
+                        <div key={variantIndex} className="bg-background rounded-lg border p-3 sm:p-4 space-y-2 sm:space-y-3">
+                            <Skeleton className="h-4 sm:h-5 w-28 sm:w-32" />
+                            <Skeleton className="h-3 sm:h-4 w-full" />
+                            <Skeleton className="h-3 sm:h-4 w-3/4" />
+                            <div className="space-y-1.5 sm:space-y-2 pt-2 sm:pt-3">
+                                <Skeleton className="h-3 w-16 sm:w-20" />
                                 <Skeleton className="h-3 w-full" />
                                 <Skeleton className="h-3 w-full" />
                                 <Skeleton className="h-3 w-full" />
@@ -237,12 +239,12 @@ const PricingForecastIndex = () => {
     return (
         <>
             <Head title="Pricing Forecast" />
-            <div className="px-4 py-6">
-                <div className="flex gap-4 items-center mb-6">
-                    <Activity className="h-8 w-8 text-primary" />
-                    <div className="flex-1">
-                        <h1 className="text-2xl font-bold">Pricing Forecast</h1>
-                        <p className="text-sm text-muted-foreground">
+            <div className="px-4 sm:px-6 py-4 sm:py-6">
+                <div className="flex gap-3 sm:gap-4 items-center mb-4 sm:mb-6">
+                    <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold truncate">Pricing Forecast</h1>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
                             Price forecasts and trends for commodities and variants
                         </p>
                     </div>
@@ -251,17 +253,17 @@ const PricingForecastIndex = () => {
                 {isLoading ? (
                     <LoadingSkeleton />
                 ) : forecastData.length === 0 ? (
-                    <div className="text-center py-12">
-                        <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <div className="text-center py-8 sm:py-12">
+                        <AlertCircle className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                        <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2 px-4">
                             No pricing data available
                         </h3>
-                        <p className="text-gray-500">
+                        <p className="text-sm sm:text-base text-gray-500 px-4">
                             Add commodities, variants, and price data to see forecasts.
                         </p>
                     </div>
                 ) : (
-                    <div className="space-y-8">
+                    <div className="space-y-6 sm:space-y-8">
                         {forecastData.map((commodityData) => {
                             const chartData = prepareChartData(commodityData);
                             const chartConfig = prepareChartConfig(commodityData);
@@ -270,11 +272,11 @@ const PricingForecastIndex = () => {
                             return (
                                 <div
                                     key={commodityData.commodity.id}
-                                    className="bg-card rounded-lg border p-6"
+                                    className="bg-card rounded-lg border p-4 sm:p-6"
                                 >
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <DollarSign className="h-6 w-6 text-primary" />
-                                        <h2 className="text-xl font-semibold">
+                                    <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                                        <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+                                        <h2 className="text-lg sm:text-xl font-semibold truncate">
                                             {commodityData.commodity.name}
                                         </h2>
                                     </div>
@@ -286,46 +288,49 @@ const PricingForecastIndex = () => {
                                     ) : (
                                         <>
                                             {/* Price History Chart */}
-                                            <div className="mb-8">
-                                                <h3 className="text-lg font-medium mb-4">Price History</h3>
-                                                <ChartContainer
-                                                    config={chartConfig}
-                                                    className="h-[400px]"
-                                                >
-                                                    <LineChart
-                                                        accessibilityLayer
-                                                        data={chartData}
-                                                        margin={{
-                                                            left: 12,
-                                                            right: 12,
-                                                            top: 12,
-                                                            bottom: 12,
-                                                        }}
+                                            <div className="mb-6 sm:mb-8 -mx-4 sm:mx-0">
+                                                <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 sm:px-0">Price History</h3>
+                                                <div className="overflow-x-auto">
+                                                    <ChartContainer
+                                                        config={chartConfig}
+                                                        className="h-[250px] sm:h-[350px] lg:h-[400px] w-full min-w-full"
                                                     >
-                                                        <CartesianGrid vertical={false} />
-                                                        <XAxis
-                                                            dataKey="date"
-                                                            tickLine={false}
-                                                            axisLine={false}
-                                                            tickMargin={8}
-                                                            interval="preserveStartEnd"
-                                                            tick={{ fontSize: 12 }}
-                                                            tickFormatter={(value, index) => {
-                                                                // Show only unique month labels
-                                                                const currentData = chartData[index];
-                                                                const prevData = chartData[index - 1];
-                                                                if (!prevData || prevData.date !== currentData?.date) {
-                                                                    return value;
-                                                                }
-                                                                return '';
+                                                        <LineChart
+                                                            accessibilityLayer
+                                                            data={chartData}
+                                                            margin={{
+                                                                left: 4,
+                                                                right: 4,
+                                                                top: 12,
+                                                                bottom: 12,
                                                             }}
-                                                        />
-                                                        <YAxis
-                                                            tickLine={false}
-                                                            axisLine={false}
-                                                            tickMargin={8}
-                                                            tickFormatter={(value) => `₱${value}`}
-                                                        />
+                                                        >
+                                                            <CartesianGrid vertical={false} />
+                                                            <XAxis
+                                                                dataKey="date"
+                                                                tickLine={false}
+                                                                axisLine={false}
+                                                                tickMargin={8}
+                                                                interval="preserveStartEnd"
+                                                                tick={{ fontSize: 10 }}
+                                                                tickFormatter={(value, index) => {
+                                                                    // Show only unique month labels
+                                                                    const currentData = chartData[index];
+                                                                    const prevData = chartData[index - 1];
+                                                                    if (!prevData || prevData.date !== currentData?.date) {
+                                                                        return value;
+                                                                    }
+                                                                    return '';
+                                                                }}
+                                                            />
+                                                            <YAxis
+                                                                tickLine={false}
+                                                                axisLine={false}
+                                                                tickMargin={4}
+                                                                width={35}
+                                                                tick={{ fontSize: 10 }}
+                                                                tickFormatter={(value) => `₱${value}`}
+                                                            />
                                                         <ChartTooltip
                                                             cursor={false}
                                                             content={
@@ -371,27 +376,28 @@ const PricingForecastIndex = () => {
                                                         })}
                                                     </LineChart>
                                                 </ChartContainer>
+                                                </div>
                                             </div>
 
                                             {/* Variants Summary */}
-                                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                                                 {commodityData.variants.map((variantData, index) => (
                                                     <div
                                                         key={variantData.variant.id}
-                                                        className="bg-background rounded-lg border p-4"
+                                                        className="bg-background rounded-lg border p-3 sm:p-4"
                                                         style={{
                                                             borderLeft: `4px solid ${getVariantColor(index)}`,
                                                         }}
                                                     >
-                                                        <div className="flex items-start justify-between mb-3">
-                                                            <h3 className="font-medium">
+                                                        <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+                                                            <h3 className="font-medium text-sm sm:text-base truncate">
                                                                 {variantData.variant.name}
                                                             </h3>
                                                             {variantData.forecast && (
-                                                                <div className="flex items-center gap-1">
+                                                                <div className="flex items-center gap-1 flex-shrink-0">
                                                                     {getTrendIcon(variantData.forecast.trend)}
                                                                     <span
-                                                                        className={`text-xs px-2 py-1 rounded ${getConfidenceColor(
+                                                                        className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded ${getConfidenceColor(
                                                                             variantData.forecast.confidence
                                                                         )}`}
                                                                     >
@@ -401,14 +407,14 @@ const PricingForecastIndex = () => {
                                                             )}
                                                         </div>
 
-                                                        <div className="space-y-3">
+                                                        <div className="space-y-2 sm:space-y-3">
                                                             {variantData.current_price ? (
-                                                                <div className="flex items-center justify-between">
-                                                                    <span className="text-sm text-muted-foreground">
+                                                                <div className="flex items-center justify-between gap-2">
+                                                                    <span className="text-xs sm:text-sm text-muted-foreground">
                                                                         Current Price
                                                                     </span>
                                                                     <div className="text-right">
-                                                                        <div className="font-semibold">
+                                                                        <div className="font-semibold text-sm sm:text-base">
                                                                             {formatCurrency(variantData.current_price.price)}
                                                                         </div>
                                                                         <div className="text-xs text-muted-foreground">
@@ -417,18 +423,18 @@ const PricingForecastIndex = () => {
                                                                     </div>
                                                                 </div>
                                                             ) : (
-                                                                <div className="text-sm text-muted-foreground italic">
+                                                                <div className="text-xs sm:text-sm text-muted-foreground italic">
                                                                     No current price data
                                                                 </div>
                                                             )}
 
                                                             {variantData.forecast && (
-                                                                <div className="flex items-center justify-between">
-                                                                    <span className="text-sm text-muted-foreground">
+                                                                <div className="flex items-center justify-between gap-2">
+                                                                    <span className="text-xs sm:text-sm text-muted-foreground">
                                                                         Price Change
                                                                     </span>
                                                                     <span
-                                                                        className={`text-sm font-medium ${
+                                                                        className={`text-xs sm:text-sm font-medium ${
                                                                             variantData.forecast.price_change_percent > 0
                                                                                 ? 'text-green-600'
                                                                                 : variantData.forecast.price_change_percent < 0
@@ -443,20 +449,20 @@ const PricingForecastIndex = () => {
                                                             )}
 
                                                             {variantData.forecast && (
-                                                                <div className="border-t pt-3">
-                                                                    <div className="text-xs font-medium text-muted-foreground mb-2">
+                                                                <div className="border-t pt-2 sm:pt-3">
+                                                                    <div className="text-xs font-medium text-muted-foreground mb-1.5 sm:mb-2">
                                                                         FORECASTS
                                                                     </div>
-                                                                    
+
                                                                     {/* Daily forecasts */}
-                                                                    <div className="space-y-1 mb-3">
+                                                                    <div className="space-y-0.5 sm:space-y-1 mb-2 sm:mb-3">
                                                                         <div className="text-xs text-muted-foreground font-medium">Daily</div>
                                                                         {variantData.forecast.forecasts
                                                                             .filter(f => f.type === 'daily')
                                                                             .map((forecast, index) => (
                                                                             <div
                                                                                 key={`daily-${index}`}
-                                                                                className="flex justify-between text-xs pl-2"
+                                                                                className="flex justify-between text-xs pl-1.5 sm:pl-2 gap-2"
                                                                             >
                                                                                 <span className="text-muted-foreground">
                                                                                     {forecast.days_ahead}d
@@ -467,16 +473,16 @@ const PricingForecastIndex = () => {
                                                                             </div>
                                                                         ))}
                                                                     </div>
-                                                                    
+
                                                                     {/* Monthly forecasts */}
-                                                                    <div className="space-y-1">
+                                                                    <div className="space-y-0.5 sm:space-y-1">
                                                                         <div className="text-xs text-muted-foreground font-medium">Monthly</div>
                                                                         {variantData.forecast.forecasts
                                                                             .filter(f => f.type === 'monthly')
                                                                             .map((forecast, index) => (
                                                                             <div
                                                                                 key={`monthly-${index}`}
-                                                                                className="flex justify-between text-xs pl-2"
+                                                                                className="flex justify-between text-xs pl-1.5 sm:pl-2 gap-2"
                                                                             >
                                                                                 <span className="text-muted-foreground">
                                                                                     {forecast.months_ahead}mo

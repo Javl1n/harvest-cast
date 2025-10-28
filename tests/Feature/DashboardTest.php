@@ -6,8 +6,8 @@ test('guests are redirected to the login page', function () {
     $this->get(route('dashboard'))->assertRedirect(route('login'));
 });
 
-test('authenticated users can visit the dashboard', function () {
-    $this->actingAs($user = User::factory()->create());
+test('authenticated users are redirected to calendar index', function () {
+    $this->actingAs(User::factory()->create());
 
-    $this->get(route('dashboard'))->assertOk();
+    $this->get(route('dashboard'))->assertRedirect(route('calendar.index'));
 });
