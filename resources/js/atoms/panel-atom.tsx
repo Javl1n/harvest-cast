@@ -2,7 +2,7 @@ import { atom } from "jotai";
 import { ImperativePanelGroupHandle } from "react-resizable-panels";
 
 // Default panel size (30% for the main content panel)
-const DEFAULT_PANEL_SIZE = 30;
+const DEFAULT_PANEL_SIZE = 0;
 
 // Atom to store current panel sizes for reference
 export const panelSizeAtom = atom<number>(DEFAULT_PANEL_SIZE);

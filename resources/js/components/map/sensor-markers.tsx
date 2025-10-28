@@ -10,6 +10,7 @@ export interface SensorMarkerInterface {
      longitude: number;
      latitude: number;
      moisture: number;
+     crop?: string;
 };
 
 
@@ -31,6 +32,7 @@ export default function SensorMarker({sensor}: {sensor: SensorMarkerInterface})
                          }} />
                     </TooltipTrigger>
                     <TooltipContent>
+                         {sensor.crop && <div>Crop: {sensor.crop}</div>}
                          <div>Longitude {sensor.longitude}</div>
                          <div>Latitude: {sensor.latitude}</div>
                          <div>Moisture: {sensor.moisture}</div>
