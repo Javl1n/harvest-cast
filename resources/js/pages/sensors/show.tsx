@@ -148,7 +148,7 @@ const SensorsShow = () => {
                                    <span className="font-medium">{sensor.readings?.length || 0}</span>
                               </div>
                               <div className="flex justify-between">
-                                   <span className="text-muted-foreground">Active Plantings</span>
+                                   <span className="text-muted-foreground">Total Plantings</span>
                                    <span className="font-medium">{sensor.schedules?.length || 0}</span>
                               </div>
                               <div className="flex justify-between">
@@ -175,52 +175,33 @@ const SensorsShow = () => {
                               <h3 className="text-sm font-semibold">Current Planting</h3>
                          </div>
 
-                         {hasPlantings && latestSchedule ? (
+                         {hasPlantings && latestSchedule && !isCurrentPlantingHarvested ? (
                               <div className="space-y-3">
                                    <div className="flex items-center justify-between">
                                         <div>
                                              <div className="flex items-center gap-2">
                                                   <h4 className="font-semibold">{latestSchedule.commodity?.name || 'Unknown Crop'}</h4>
-                                                  {isCurrentPlantingHarvested ? (
-                                                       <Badge className="bg-green-100 text-green-800 text-xs px-1 py-0">
-                                                            Harvested
-                                                       </Badge>
-                                                  ) : (
-                                                       <Badge className="bg-blue-100 text-blue-800 text-xs px-1 py-0">
-                                                            Growing
-                                                       </Badge>
-                                                  )}
+                                                  <Badge className="bg-blue-100 text-blue-800 text-xs px-1 py-0">
+                                                       Growing
+                                                  </Badge>
                                              </div>
                                              <p className="text-xs text-muted-foreground">
                                                   Planted {formatShortDate(latestSchedule.date_planted)}
-                                                  {isCurrentPlantingHarvested && latestSchedule.actual_harvest_date && (
-                                                       <span> • Harvested {formatShortDate(latestSchedule.actual_harvest_date)}</span>
-                                                  )}
                                              </p>
                                         </div>
                                         <div className="flex gap-2">
-                                             {!isCurrentPlantingHarvested && (
-                                                  <Button
-                                                       size="sm"
-                                                       variant="outline"
-                                                       className="text-xs h-7"
-                                                       onClick={handleHarvest}
-                                                       disabled={processing}
-                                                  >
-                                                       {processing ? 'Harvesting...' : 'Mark Harvested'}
-                                                  </Button>
-                                             )}
-                                             {canPlantNew ? (
-                                                  <Link href={crops.create(sensor)}>
-                                                       <Button size="sm" className="text-xs h-7">
-                                                            {isCurrentPlantingHarvested ? 'Plant New' : 'Manage'}
-                                                       </Button>
-                                                  </Link>
-                                             ) : (
-                                                  <Button size="sm" className="text-xs h-7" disabled>
-                                                       Harvest First
-                                                  </Button>
-                                             )}
+                                             <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  className="text-xs h-7"
+                                                  onClick={handleHarvest}
+                                                  disabled={processing}
+                                             >
+                                                  {processing ? 'Harvesting...' : 'Mark Harvested'}
+                                             </Button>
+                                             <Button size="sm" className="text-xs h-7" disabled>
+                                                  Harvest First
+                                             </Button>
                                         </div>
                                    </div>
 
@@ -234,54 +215,48 @@ const SensorsShow = () => {
                                              <div className="font-medium">{latestSchedule.seeds_planted.toLocaleString()}</div>
                                         </div>
                                         <div>
-                                             <div className="text-muted-foreground">{isCurrentPlantingHarvested ? 'Harvested' : 'Expected Harvest'}</div>
+                                             <div className="text-muted-foreground">Expected Harvest</div>
                                              <div className="font-medium">
-                                                  {isCurrentPlantingHarvested && latestSchedule.actual_harvest_date
-                                                       ? formatShortDate(latestSchedule.actual_harvest_date)
-                                                       : latestSchedule.expected_harvest_date
+                                                  {latestSchedule.expected_harvest_date
                                                        ? formatShortDate(latestSchedule.expected_harvest_date)
                                                        : 'Not set'
                                                   }
                                              </div>
                                         </div>
                                         <div>
-                                             <div className="text-muted-foreground">{isCurrentPlantingHarvested ? 'Actual Income' : 'Expected Income'}</div>
+                                             <div className="text-muted-foreground">Expected Income</div>
                                              <div className="font-medium">
-                                                  ${(isCurrentPlantingHarvested ? latestSchedule.income : latestSchedule.expected_income)?.toLocaleString() || '0'}
+                                                  ${latestSchedule.expected_income?.toLocaleString() || '0'}
                                              </div>
                                         </div>
                                    </div>
 
-                                   {!isCurrentPlantingHarvested && (
-                                        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                                             <div className="flex items-center gap-1 text-yellow-800">
-                                                  <AlertCircle className="h-3 w-3" />
-                                                  <span className="font-medium">Crop is still growing</span>
-                                             </div>
-                                             <div className="text-yellow-700 mt-1">
-                                                  Harvest this crop before planting a new one on this sensor.
-                                             </div>
+                                   <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                                        <div className="flex items-center gap-1 text-yellow-800">
+                                             <AlertCircle className="h-3 w-3" />
+                                             <span className="font-medium">Crop is still growing</span>
                                         </div>
-                                   )}
+                                        <div className="text-yellow-700 mt-1">
+                                             Harvest this crop before planting a new one on this sensor.
+                                        </div>
+                                   </div>
                               </div>
                          ) : (
                               <div className="text-center py-6">
                                    <Wheat className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
-                                   <p className="text-sm font-medium mb-1">No Crops Planted</p>
-                                   <p className="text-xs text-muted-foreground mb-3">This sensor doesn't have any active plantings.</p>
-                                   {canPlantNew ? (
-                                        <Link href={crops.create(sensor)}>
-                                             <Button size="sm" className="text-xs">
-                                                  <Wheat className="h-3 w-3 mr-1" />
-                                                  Plant Crop
-                                             </Button>
-                                        </Link>
-                                   ) : (
-                                        <Button size="sm" className="text-xs" disabled>
+                                   <p className="text-sm font-medium mb-1">No Active Planting</p>
+                                   <p className="text-xs text-muted-foreground mb-3">
+                                        {isCurrentPlantingHarvested && latestSchedule
+                                             ? `Sensor is available. Last harvest: ${latestSchedule.commodity?.name} on ${formatShortDate(latestSchedule.actual_harvest_date!)}`
+                                             : 'This sensor is ready for a new planting.'
+                                        }
+                                   </p>
+                                   <Link href={crops.create(sensor)}>
+                                        <Button size="sm" className="text-xs">
                                              <Wheat className="h-3 w-3 mr-1" />
-                                             Harvest Required
+                                             Plant Crop
                                         </Button>
-                                   )}
+                                   </Link>
                               </div>
                          )}
                     </div>

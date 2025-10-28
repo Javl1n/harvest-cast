@@ -5,7 +5,7 @@ import sensors from '@/routes/sensors';
 import calendar from '@/routes/calendar';
 import { SensorInterface, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { CircleDot, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Sprout, CheckCircle2 } from 'lucide-react';
+import { CircleDot, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Sprout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -125,6 +125,11 @@ const SensorsIndex = () => {
                          {sensorsData.length > 0 ? (
                               <div className="space-y-4">
                                    {sensorsData.map((sensor) => {
+                                        // Treat harvested sensors as empty/available
+                                        const isHarvested = sensor.latest_schedule?.actual_harvest_date;
+                                        const hasActivePlanting = sensor.latest_schedule && !isHarvested;
+                                        const isEmpty = !sensor.latest_schedule || isHarvested;
+
                                         const moistureLevel = sensor.latest_reading?.moisture ?? 0;
                                         const borderColor = sensor.latest_reading
                                              ? `hsl(${(moistureLevel / 100) * 120}, 80%, 60%)`
@@ -146,21 +151,15 @@ const SensorsIndex = () => {
                                                                  <div>
                                                                       <div className="flex items-center gap-2 mb-1">
                                                                            <h3 className="text-xl font-bold">
-                                                                                {sensor.latest_schedule?.commodity?.name || 'No Planting'}
+                                                                                {isEmpty ? 'No Active Planting' : sensor.latest_schedule?.commodity?.name}
                                                                            </h3>
-                                                                           {!sensor.latest_schedule && (
+                                                                           {isEmpty && (
                                                                                 <Badge variant="outline" className="text-xs">
                                                                                      <Sprout className="h-3 w-3 mr-1" />
                                                                                      Available
                                                                                 </Badge>
                                                                            )}
-                                                                           {sensor.latest_schedule?.actual_harvest_date && (
-                                                                                <Badge variant="secondary" className="text-xs">
-                                                                                     <CheckCircle2 className="h-3 w-3 mr-1" />
-                                                                                     Harvested
-                                                                                </Badge>
-                                                                           )}
-                                                                           {sensor.latest_schedule && !sensor.latest_schedule.actual_harvest_date && (
+                                                                           {hasActivePlanting && (
                                                                                 <Badge variant="default" className="text-xs">
                                                                                      Active
                                                                                 </Badge>
@@ -169,6 +168,11 @@ const SensorsIndex = () => {
                                                                       <p className="text-sm text-muted-foreground">
                                                                            Sensor ID: {sensor.id.substring(0, 8)}...
                                                                       </p>
+                                                                      {isHarvested && sensor.latest_schedule && (
+                                                                           <p className="text-xs text-muted-foreground mt-1">
+                                                                                Last harvest: {sensor.latest_schedule.commodity?.name} on {new Date(sensor.latest_schedule.actual_harvest_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                                           </p>
+                                                                      )}
                                                                  </div>
                                                             </div>
                                                             <Link
@@ -179,7 +183,7 @@ const SensorsIndex = () => {
                                                             </Link>
                                                        </div>
 
-                                                       {sensor.latest_schedule && (
+                                                       {hasActivePlanting && sensor.latest_schedule && (
                                                             <div className="grid grid-cols-4 gap-4 mb-4 bg-muted/30 dark:bg-muted/10 rounded-lg p-4">
                                                                  <div>
                                                                       <div className="text-muted-foreground text-xs mb-1">Area</div>
