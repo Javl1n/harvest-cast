@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Commodity;
-use App\Models\CropRecommendation;
 use App\Models\Schedule;
 use App\Models\Sensor;
 use App\Models\Weather;
 use App\Services\CropRecommendationService;
+use App\Services\YieldForecastService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -18,9 +18,13 @@ class CalendarPageController extends Controller
      */
     public function index()
     {
-        // return inertia()->render('calendar/index', [
-        //     // 'sensors' => Sensor::all()->load('latestReading'),
-        // ]);
+        return inertia()->render('sensors/index', [
+            'sensors' => Sensor::with([
+                'latestReading',
+                'latestSchedule.commodity',
+            ])->get(),
+            'commodities' => Commodity::all(),
+        ]);
     }
 
     /**
@@ -31,30 +35,30 @@ class CalendarPageController extends Controller
         $latestReading = $sensor->latestReading;
         $recommendations = [];
         $currentConditions = null;
-        
+
         if ($latestReading) {
             // Get latest weather with caching
             $latestWeather = Cache::remember('latest_weather', 300, function () {
                 return Weather::latest()->first();
             });
-            
+
             // Cache recommendations for 10 minutes
-            $cacheKey = "crop_rec_create_{$sensor->id}_{$latestReading->id}_" . ($latestWeather?->id ?? 'no_weather');
-            
+            $cacheKey = "crop_rec_create_{$sensor->id}_{$latestReading->id}_".($latestWeather?->id ?? 'no_weather');
+
             $recommendations = Cache::remember($cacheKey, 600, function () use ($cropService, $latestReading, $latestWeather) {
                 return $cropService->getRecommendations(
                     $latestReading->moisture,
                     $latestWeather
                 );
             });
-            
+
             $currentConditions = [
                 'soil_moisture' => $latestReading->moisture,
                 'temperature' => $latestWeather?->temperature,
                 'weather_condition' => $latestWeather?->condition,
                 'humidity' => $latestWeather?->humidity,
                 'reading_date' => $latestReading->created_at,
-                'weather_date' => $latestWeather?->created_at
+                'weather_date' => $latestWeather?->created_at,
             ];
         }
 
@@ -63,7 +67,7 @@ class CalendarPageController extends Controller
             'commodities' => Commodity::with('variants')->get(),
             'cropRecommendations' => $recommendations,
             'currentConditions' => $currentConditions,
-            'hasRecommendations' => !empty($recommendations)
+            'hasRecommendations' => ! empty($recommendations),
         ]);
     }
 
@@ -90,13 +94,57 @@ class CalendarPageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Sensor $sensor)
+    public function show(Sensor $sensor, YieldForecastService $yieldForecastService)
     {
-        
+        $latestReading = $sensor->latestReading;
+        $latestSchedule = $sensor->latestSchedule;
+        $careRecommendations = [];
+        $currentConditions = null;
+        $yieldForecast = null;
 
-        // return inertia()->render('calendar/show', [
-        //     'sensor' => $sensor->load('readings', 'latest_reading')
-        // ]);
+        if ($latestReading) {
+            // Get latest weather with caching
+            $latestWeather = Cache::remember('latest_weather', 300, function () {
+                return Weather::latest()->first();
+            });
+
+            $currentConditions = [
+                'soil_moisture' => $latestReading->moisture,
+                'temperature' => $latestWeather?->temperature,
+                'weather_condition' => $latestWeather?->condition,
+                'humidity' => $latestWeather?->humidity,
+                'reading_date' => $latestReading->created_at,
+                'weather_date' => $latestWeather?->created_at,
+            ];
+
+            // Get care recommendations if there's an active planting
+            if ($latestSchedule && ! $latestSchedule->actual_harvest_date) {
+                $daysSincePlanting = $latestSchedule->date_planted
+                    ? now()->diffInDays($latestSchedule->date_planted)
+                    : null;
+
+                $careService = app(\App\Services\CropCareRecommendationService::class);
+                $careRecommendations = $careService->getCareRecommendations(
+                    $latestReading->moisture,
+                    $latestWeather,
+                    $latestSchedule->commodity,
+                    $daysSincePlanting
+                );
+            }
+        }
+
+        // Get yield forecast for active planting
+        if ($latestSchedule && ! $latestSchedule->actual_harvest_date) {
+            $yieldForecast = $yieldForecastService->getForecast($latestSchedule);
+        }
+
+        return inertia()->render('sensors/show', [
+            'sensor' => $sensor->load('readings', 'latestReading', 'schedules.commodity', 'latestSchedule.commodity'),
+            'careRecommendations' => $careRecommendations,
+            'currentConditions' => $currentConditions,
+            'hasCareRecommendations' => ! empty($careRecommendations),
+            'yieldForecast' => $yieldForecast,
+        ]);
     }
 
     /**
@@ -121,46 +169,58 @@ class CalendarPageController extends Controller
     public function recommendations(Sensor $sensor, CropRecommendationService $cropService)
     {
         $latestReading = $sensor->latestReading;
-        
-        if (!$latestReading) {
+
+        if (! $latestReading) {
             return response()->json([
                 'error' => 'No sensor readings available for this sensor.',
                 'recommendations' => [],
-                'currentConditions' => null
+                'currentConditions' => null,
             ], 400);
         }
 
         $latestWeather = Cache::remember('latest_weather', 300, function () {
             return Weather::latest()->first();
         });
-        
+
         // Use shorter cache for API requests (5 minutes)
-        $cacheKey = "api_crop_rec_{$sensor->id}_{$latestReading->id}_" . ($latestWeather?->id ?? 'no_weather');
-        
+        $cacheKey = "api_crop_rec_{$sensor->id}_{$latestReading->id}_".($latestWeather?->id ?? 'no_weather');
+
         $recommendations = Cache::remember($cacheKey, 300, function () use ($cropService, $latestReading, $latestWeather) {
             return $cropService->getRecommendations(
                 $latestReading->moisture,
                 $latestWeather
             );
         });
-        
+
         $currentConditions = [
             'soil_moisture' => $latestReading->moisture,
             'temperature' => $latestWeather?->temperature,
             'weather_condition' => $latestWeather?->condition,
             'humidity' => $latestWeather?->humidity,
             'reading_date' => $latestReading->created_at,
-            'weather_date' => $latestWeather?->created_at
+            'weather_date' => $latestWeather?->created_at,
         ];
 
         return response()->json([
             'success' => true,
             'recommendations' => $recommendations,
             'currentConditions' => $currentConditions,
-            'timestamp' => now()->toISOString()
+            'timestamp' => now()->toISOString(),
         ]);
     }
-    
+
+    /**
+     * Mark a schedule as harvested
+     */
+    public function harvest(Schedule $schedule)
+    {
+        $schedule->update([
+            'actual_harvest_date' => now(),
+        ]);
+
+        return back()->with('success', 'Crop marked as harvested successfully!');
+    }
+
     /**
      * Remove the specified resource from storage.
      */

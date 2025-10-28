@@ -15,9 +15,19 @@ class Schedule extends Model
         'expected_harvest_date',
         'actual_harvest_date',
         'yield',
+        'expected_yield',
         'expected_income',
-        'income'
+        'income',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'date_planted' => 'datetime',
+            'expected_harvest_date' => 'datetime',
+            'actual_harvest_date' => 'datetime',
+        ];
+    }
 
     public function sensor()
     {
@@ -28,6 +38,4 @@ class Schedule extends Model
     {
         return $this->belongsTo(Commodity::class, 'commodity_id');
     }
-
-    
 }

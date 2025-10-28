@@ -10,7 +10,7 @@ import Sensors from './sensors';
 
 export default function AppMap() {
      const { appearance, updateAppearance } = useAppearance();
-     const [longitude, latitude] = [125.077261, 6.219394];
+     const [latitude, longitude] = [6.295444236974252, 124.97472931140271];
 
      const style = {
           'light' : 'satellite-v9',

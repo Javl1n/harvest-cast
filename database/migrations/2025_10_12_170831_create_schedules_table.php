@@ -19,10 +19,11 @@ return new class extends Migration
             $table->integer('seeds_planted');
             $table->date('date_planted');
             $table->date('expected_harvest_date');
-            $table->date('actual_harvest_date');
-            $table->float('yield', 2);
-            $table->float('expected_income', 2);
-            $table->float('income', 2);
+            $table->date('actual_harvest_date')->nullable();
+            $table->float('yield', 2)->nullable();
+            $table->float('expected_yield', 2)->nullable();
+            $table->float('expected_income', 2)->nullable();
+            $table->float('income', 2)->nullable();
             $table->timestamps();
         });
     }

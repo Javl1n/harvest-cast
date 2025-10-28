@@ -17,7 +17,15 @@ class SensorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'mac_address' => fake()->unique()->macAddress(),
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->has(
+            \App\Models\SensorReading::factory()->count(5),
+            'readings'
+        );
     }
 }

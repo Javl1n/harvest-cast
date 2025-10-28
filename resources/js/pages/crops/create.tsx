@@ -8,7 +8,8 @@ import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem, CommodityInterface, SensorInterface, CropRecommendation, CurrentConditions } from "@/types";
 import { Head, useForm, usePage } from "@inertiajs/react";
 import { CalendarDays, Wheat } from "lucide-react";
-import { FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
+import { useSetPanelSize } from "@/hooks/use-set-panel-size";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +18,39 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+// Typical seeding rates per hectare for common crops
+const SEEDING_RATES: { [key: string]: number } = {
+    'rice': 120000, // 120,000 seeds per hectare
+    'corn': 70000,  // 70,000 seeds per hectare
+    'wheat': 350000, // 350,000 seeds per hectare
+    'barley': 300000, // 300,000 seeds per hectare
+    'soybean': 400000, // 400,000 seeds per hectare
+    'cotton': 150000, // 150,000 seeds per hectare
+    'sunflower': 55000, // 55,000 seeds per hectare
+    'tomato': 25000, // 25,000 seeds per hectare
+    'lettuce': 800000, // 800,000 seeds per hectare
+    'carrot': 2000000, // 2,000,000 seeds per hectare
+    'cabbage': 40000, // 40,000 seeds per hectare
+    'onion': 1000000, // 1,000,000 seeds per hectare
+    'potato': 40000, // 40,000 seed tubers per hectare
+    'bean': 200000, // 200,000 seeds per hectare
+    'pea': 250000, // 250,000 seeds per hectare
+};
+
+// Function to calculate seeds based on area and crop type
+const calculateSeeds = (hectares: string, cropName: string): string => {
+    const area = parseFloat(hectares);
+    if (!area || area <= 0 || !cropName) return '';
+    
+    const seedingRate = SEEDING_RATES[cropName.toLowerCase()] || 100000; // Default rate
+    const totalSeeds = Math.round(area * seedingRate);
+    
+    return totalSeeds.toString();
+};
+
 const CropCreate = () => {
+    useSetPanelSize(50);
+    
     const { sensor, commodities, cropRecommendations, currentConditions, hasRecommendations } = usePage<{
         sensor: SensorInterface;
         commodities: CommodityInterface[];
@@ -53,6 +86,22 @@ const CropCreate = () => {
             };
         });
     };
+
+    // Automatically calculate seeds when area or crop type changes
+    useEffect(() => {
+        if (data.hectares && data.commodity_id) {
+            const selectedCommodity = commodities.find(c => c.id.toString() === data.commodity_id);
+            if (selectedCommodity) {
+                const calculatedSeeds = calculateSeeds(data.hectares, selectedCommodity.name);
+                if (calculatedSeeds && calculatedSeeds !== data.seeds_planted) {
+                    setData(prevData => ({
+                        ...prevData,
+                        seeds_planted: calculatedSeeds
+                    }));
+                }
+            }
+        }
+    }, [data.hectares, data.commodity_id, commodities]);
 
     // Function to recalculate harvest date when plant date changes
     const handleDatePlantedChange = (newDatePlanted: string) => {
@@ -153,16 +202,28 @@ const CropCreate = () => {
                             </div>
 
                             <div className="space-y-1">
-                                <Label htmlFor="seeds_planted" className="text-sm">Seeds Planted *</Label>
+                                <Label htmlFor="seeds_planted" className="text-sm">
+                                    Seeds Planted *
+                                    {data.hectares && data.commodity_id && (
+                                        <span className="text-xs text-muted-foreground ml-1">(Auto-calculated)</span>
+                                    )}
+                                </Label>
                                 <Input
                                     id="seeds_planted"
                                     type="number"
                                     min="1"
-                                    placeholder="e.g., 1000"
+                                    placeholder="Enter area and crop type above"
                                     value={data.seeds_planted}
                                     onChange={(e) => setData('seeds_planted', e.target.value)}
-                                    className={`text-sm ${errors.seeds_planted ? 'border-destructive' : ''}`}
+                                    className={`text-sm ${errors.seeds_planted ? 'border-destructive' : ''} ${
+                                        data.hectares && data.commodity_id ? 'bg-muted/50' : ''
+                                    }`}
                                 />
+                                {data.hectares && data.commodity_id && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Based on typical seeding rate for {commodities.find(c => c.id.toString() === data.commodity_id)?.name.toLowerCase()}
+                                    </p>
+                                )}
                                 <InputError message={errors.seeds_planted} />
                             </div>
                         </div>

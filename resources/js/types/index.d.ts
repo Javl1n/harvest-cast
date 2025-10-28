@@ -51,6 +51,8 @@ export interface SensorInterface {
     readings: SensorReadingInterface[];
     latest_reading: SensorReadingInterface;
     oldest_reading: SensorReadingInterface;
+    latest_schedule?: ScheduleInterface;
+    schedules?: ScheduleInterface[];
     [key: string]: unknown;
 }
 
@@ -123,4 +125,44 @@ export interface CurrentConditions {
     humidity?: number;
     reading_date: string;
     weather_date?: string;
+}
+
+export interface CropCareRecommendation {
+    action: string;
+    description: string;
+    icon: string;
+    priority: 'high' | 'medium' | 'low';
+    category: string;
+}
+
+export interface YieldForecast {
+    predicted_yield: number;
+    expected_yield?: number;
+    optimistic_yield: number;
+    pessimistic_yield: number;
+    yield_per_hectare: number;
+    confidence: 'high' | 'medium' | 'low';
+    confidence_score: number;
+    r_squared: number;
+    variance_from_expected_percent: number;
+    environmental_factors: EnvironmentalFactor[];
+    historical_yields: HistoricalYieldPoint[];
+    growth_progress_percent: number;
+    days_until_harvest: number;
+    model_type: 'ml_regression' | 'basic_estimate';
+    sample_size: number;
+}
+
+export interface EnvironmentalFactor {
+    factor: string;
+    impact: string;
+    weight: number;
+    status?: 'good' | 'warning' | 'info' | 'error';
+}
+
+export interface HistoricalYieldPoint {
+    date: string;
+    yield: number;
+    yield_per_hectare: number;
+    hectares: number;
 }

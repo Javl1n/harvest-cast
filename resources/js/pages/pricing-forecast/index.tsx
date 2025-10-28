@@ -7,6 +7,7 @@ import { TrendingUp, TrendingDown, Minus, AlertCircle, DollarSign, Activity } fr
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useSetPanelSize } from '@/hooks/use-set-panel-size';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Price {
     id: number;
@@ -31,7 +32,9 @@ interface Forecast {
     forecasts: Array<{
         date: string;
         price: number;
-        days_ahead: number;
+        days_ahead?: number;
+        months_ahead?: number;
+        type: 'daily' | 'monthly';
     }>;
     confidence: 'high' | 'medium' | 'low';
 }
@@ -49,7 +52,7 @@ interface CommodityData {
 }
 
 interface PageProps extends InertiaPageProps {
-    forecastData: CommodityData[];
+    forecastData?: CommodityData[] | null;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -68,10 +71,50 @@ const CHART_COLORS = [
     '#14532d', // green-900
 ];
 
+// Loading skeleton component
+const LoadingSkeleton = () => (
+    <div className="space-y-8">
+        {[1, 2].map((commodityIndex) => (
+            <div key={commodityIndex} className="bg-card rounded-lg border p-6">
+                <div className="flex items-center gap-3 mb-6">
+                    <Skeleton className="h-6 w-6 rounded" />
+                    <Skeleton className="h-6 w-48" />
+                </div>
+
+                {/* Chart skeleton */}
+                <div className="mb-8">
+                    <Skeleton className="h-5 w-32 mb-4" />
+                    <Skeleton className="h-[400px] w-full rounded-lg" />
+                </div>
+
+                {/* Variant cards skeleton */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {[1, 2, 3].map((variantIndex) => (
+                        <div key={variantIndex} className="bg-background rounded-lg border p-4 space-y-3">
+                            <Skeleton className="h-5 w-32" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-3/4" />
+                            <div className="space-y-2 pt-3">
+                                <Skeleton className="h-3 w-20" />
+                                <Skeleton className="h-3 w-full" />
+                                <Skeleton className="h-3 w-full" />
+                                <Skeleton className="h-3 w-full" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
 const PricingForecastIndex = () => {
     const { forecastData } = usePage<PageProps>().props;
 
     useSetPanelSize(56);
+
+    // Show loading skeleton if data is not loaded yet
+    const isLoading = !forecastData;
 
     const getTrendIcon = (trend: string) => {
         switch (trend) {
@@ -107,7 +150,15 @@ const PricingForecastIndex = () => {
     const formatDate = (dateString: string) => {
         return new Intl.DateTimeFormat('en-US', {
             month: 'short',
+            year: 'numeric',
+        }).format(new Date(dateString));
+    };
+    
+    const formatTooltipDate = (dateString: string) => {
+        return new Intl.DateTimeFormat('en-US', {
+            month: 'short',
             day: 'numeric',
+            year: 'numeric',
         }).format(new Date(dateString));
     };
 
@@ -125,10 +176,28 @@ const PricingForecastIndex = () => {
 
         // Sort dates chronologically
         const sortedDates = Array.from(dateSet).sort();
-
-        // Create data points for each date
+        
+        // Group dates by month for cleaner x-axis display
+        const monthMap = new Map<string, string[]>();
         sortedDates.forEach(date => {
-            const dataPoint: { [key: string]: unknown } = { date: formatDate(date) };
+            const monthKey = formatDate(date); // "Mar 2025" format
+            if (!monthMap.has(monthKey)) {
+                monthMap.set(monthKey, []);
+            }
+            monthMap.get(monthKey)!.push(date);
+        });
+
+        // Create data points for each date but with month grouping awareness
+        sortedDates.forEach((date, index) => {
+            const monthKey = formatDate(date);
+            const isFirstInMonth = monthMap.get(monthKey)![0] === date;
+            
+            const dataPoint: { [key: string]: unknown } = { 
+                date: monthKey, // This will show month-year format
+                fullDate: date, // Keep the full date for internal reference
+                isFirstInMonth: isFirstInMonth,
+                index: index
+            };
             
             commodityData.variants.forEach(variant => {
                 const priceForDate = variant.price_history.find(p => p.date === date);
@@ -179,7 +248,9 @@ const PricingForecastIndex = () => {
                     </div>
                 </div>
 
-                {forecastData.length === 0 ? (
+                {isLoading ? (
+                    <LoadingSkeleton />
+                ) : forecastData.length === 0 ? (
                     <div className="text-center py-12">
                         <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -237,6 +308,17 @@ const PricingForecastIndex = () => {
                                                             tickLine={false}
                                                             axisLine={false}
                                                             tickMargin={8}
+                                                            interval="preserveStartEnd"
+                                                            tick={{ fontSize: 12 }}
+                                                            tickFormatter={(value, index) => {
+                                                                // Show only unique month labels
+                                                                const currentData = chartData[index];
+                                                                const prevData = chartData[index - 1];
+                                                                if (!prevData || prevData.date !== currentData?.date) {
+                                                                    return value;
+                                                                }
+                                                                return '';
+                                                            }}
                                                         />
                                                         <YAxis
                                                             tickLine={false}
@@ -253,6 +335,13 @@ const PricingForecastIndex = () => {
                                                                         formatCurrency(Number(value)),
                                                                         name,
                                                                     ]}
+                                                                    labelFormatter={(label, payload) => {
+                                                                        if (payload && payload[0] && payload[0].payload) {
+                                                                            const fullDate = payload[0].payload.fullDate;
+                                                                            return fullDate ? formatTooltipDate(fullDate) : label;
+                                                                        }
+                                                                        return label;
+                                                                    }}
                                                                 />
                                                             }
                                                         />
@@ -270,8 +359,8 @@ const PricingForecastIndex = () => {
                                                                     strokeWidth={2}
                                                                     dot={{
                                                                         fill: color,
-                                                                        strokeWidth: 2,
-                                                                        r: 4,
+                                                                        strokeWidth: 0,
+                                                                        r: 0,
                                                                     }}
                                                                     activeDot={{
                                                                         r: 6,
@@ -358,14 +447,39 @@ const PricingForecastIndex = () => {
                                                                     <div className="text-xs font-medium text-muted-foreground mb-2">
                                                                         FORECASTS
                                                                     </div>
-                                                                    <div className="space-y-1">
-                                                                        {variantData.forecast.forecasts.map((forecast, index) => (
+                                                                    
+                                                                    {/* Daily forecasts */}
+                                                                    <div className="space-y-1 mb-3">
+                                                                        <div className="text-xs text-muted-foreground font-medium">Daily</div>
+                                                                        {variantData.forecast.forecasts
+                                                                            .filter(f => f.type === 'daily')
+                                                                            .map((forecast, index) => (
                                                                             <div
-                                                                                key={index}
-                                                                                className="flex justify-between text-xs"
+                                                                                key={`daily-${index}`}
+                                                                                className="flex justify-between text-xs pl-2"
                                                                             >
                                                                                 <span className="text-muted-foreground">
                                                                                     {forecast.days_ahead}d
+                                                                                </span>
+                                                                                <span className="font-medium">
+                                                                                    {formatCurrency(forecast.price)}
+                                                                                </span>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                    
+                                                                    {/* Monthly forecasts */}
+                                                                    <div className="space-y-1">
+                                                                        <div className="text-xs text-muted-foreground font-medium">Monthly</div>
+                                                                        {variantData.forecast.forecasts
+                                                                            .filter(f => f.type === 'monthly')
+                                                                            .map((forecast, index) => (
+                                                                            <div
+                                                                                key={`monthly-${index}`}
+                                                                                className="flex justify-between text-xs pl-2"
+                                                                            >
+                                                                                <span className="text-muted-foreground">
+                                                                                    {forecast.months_ahead}mo
                                                                                 </span>
                                                                                 <span className="font-medium">
                                                                                     {formatCurrency(forecast.price)}

@@ -45,12 +45,10 @@ export default ({ children, breadcrumbs, hidden = false, ...props }: AppLayoutPr
         }
     };
 
-    console.log(weather);
-
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
             <div className="h-full w-full">
-                {true && <ResizablePanelGroup 
+                <ResizablePanelGroup 
                     ref={panelGroupRef}
                     direction='horizontal' 
                     className="w-full absolute pointer-events-none z-50 h-full p-3"
@@ -61,9 +59,9 @@ export default ({ children, breadcrumbs, hidden = false, ...props }: AppLayoutPr
                             {children}
                         </div>
                     </ResizablePanel>
-                    <ResizableHandle withHandle className='my-auto' />
-                    <ResizablePanel />
-                </ResizablePanelGroup>}
+                    <ResizableHandle withHandle hidden={hidden} className='my-auto' />
+                    <ResizablePanel defaultSize={100 - savedSize} />
+                </ResizablePanelGroup>
                 <div className='flex gap-3 absolute top-4 right-4 z-50 pointer-events-none'>
                     <div className='pointer-events-auto'>
                         <WeatherWidget weather={weather} />

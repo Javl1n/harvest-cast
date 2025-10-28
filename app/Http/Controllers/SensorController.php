@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\SensorUpdated;
+use App\Models\Commodity;
 use App\Models\Sensor;
 use Illuminate\Http\Request;
 
@@ -14,7 +14,11 @@ class SensorController extends Controller
     public function index()
     {
         return inertia()->render('sensors/index', [
-            // 'sensors' => Sensor::all()->load('latestReading'),
+            'sensors' => Sensor::with([
+                'latestReading',
+                'latestSchedule.commodity',
+            ])->get(),
+            'commodities' => Commodity::all(),
         ]);
     }
 
@@ -34,17 +38,17 @@ class SensorController extends Controller
         // dump($request->all());
 
         $request->validate([
-            "uuid" => "nullable|string",
-            "mac" => "required|mac_address",
+            'uuid' => 'nullable|string',
+            'mac' => 'required|mac_address',
         ]);
 
-        if ($request->filled('uuid')){
+        if ($request->filled('uuid')) {
             $sensor = Sensor::find($request->uuid);
 
             if ($sensor) {
                 return response()->json([
-                    "uuid" => $sensor->id,
-                    "status" => "exists"
+                    'uuid' => $sensor->id,
+                    'status' => 'exists',
                 ]);
             }
         }
@@ -55,7 +59,7 @@ class SensorController extends Controller
 
         return response()->json([
             'uuid' => $sensor->id,
-            "status" => "registered",
+            'status' => 'registered',
         ]);
     }
 
@@ -65,7 +69,7 @@ class SensorController extends Controller
     public function show(Sensor $sensor)
     {
         return inertia()->render('sensors/show', [
-            'sensor' => $sensor->load('readings', 'latestReading', 'schedules')
+            'sensor' => $sensor->load('readings', 'latestReading', 'schedules'),
         ]);
     }
 
