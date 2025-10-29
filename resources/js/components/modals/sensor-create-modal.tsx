@@ -32,11 +32,11 @@ const SensorCreateModal: React.FC<SensorCreateModalProps> = ({
     const { data, setData, post, processing, errors, reset } = useForm({
         // Sensor data
         mac: '',
-        
+
         // Planting/Schedule data
         commodity_id: '',
         hectares: '',
-        seeds_planted: '',
+        seed_weight_kg: '',
         date_planted: selectedDate ? selectedDate.toISOString().split('T')[0] : '',
         expected_harvest_date: '',
         expected_income: '',
@@ -133,15 +133,17 @@ const SensorCreateModal: React.FC<SensorCreateModalProps> = ({
                                 </div>
 
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="seeds_planted" className="text-right">
-                                        Seeds Planted
+                                    <Label htmlFor="seed_weight_kg" className="text-right">
+                                        Seed Weight (kg)
                                     </Label>
                                     <Input
-                                        id="seeds_planted"
+                                        id="seed_weight_kg"
                                         type="number"
-                                        placeholder="1000"
-                                        value={data.seeds_planted}
-                                        onChange={(e) => setData('seeds_planted', e.target.value)}
+                                        step="0.01"
+                                        min="0.01"
+                                        placeholder="2.5"
+                                        value={data.seed_weight_kg}
+                                        onChange={(e) => setData('seed_weight_kg', e.target.value)}
                                         className="col-span-3"
                                     />
                                 </div>

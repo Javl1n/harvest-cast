@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             WeatherSeeder::class,
             CropRecommendationSeeder::class,
             SensorSeeder::class,
+            ScheduleSeeder::class,
         ]);
     }
 }

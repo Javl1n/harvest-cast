@@ -10,7 +10,7 @@ class Schedule extends Model
         'commodity_id',
         'sensor_id',
         'hectares',
-        'seeds_planted',
+        'seed_weight_kg',
         'date_planted',
         'expected_harvest_date',
         'actual_harvest_date',
@@ -23,6 +23,7 @@ class Schedule extends Model
     protected function casts(): array
     {
         return [
+            'seed_weight_kg' => 'decimal:2',
             'date_planted' => 'datetime',
             'expected_harvest_date' => 'datetime',
             'actual_harvest_date' => 'datetime',

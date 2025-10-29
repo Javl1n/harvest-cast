@@ -26,7 +26,7 @@ describe('Role-Based Authorization', function () {
                 'commodity_id' => 1,
                 'sensor_id' => $sensor->id,
                 'hectares' => 10.5,
-                'seeds_planted' => 1000,
+                'seed_weight_kg' => 5.0,
                 'date_planted' => now()->toDateString(),
                 'expected_harvest_date' => now()->addMonths(3)->toDateString(),
             ]);
@@ -79,7 +79,7 @@ describe('Role-Based Authorization', function () {
                 'commodity_id' => 1,
                 'sensor_id' => $sensor->id,
                 'hectares' => 10.5,
-                'seeds_planted' => 1000,
+                'seed_weight_kg' => 5.0,
                 'date_planted' => now()->toDateString(),
                 'expected_harvest_date' => now()->addMonths(3)->toDateString(),
             ]);

@@ -92,7 +92,7 @@ export interface ScheduleInterface {
     commodity_id: number;
     sensor_id: string;
     hectares: number;
-    seeds_planted: number;
+    seed_weight_kg: number;
     date_planted: string;
     expected_harvest_date?: string;
     actual_harvest_date?: string;

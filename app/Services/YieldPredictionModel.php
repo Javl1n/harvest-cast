@@ -14,12 +14,15 @@ class YieldPredictionModel
 
     private array $featureNames = [];
 
+    private array $activeFeatureIndices = [];
+
     /**
      * Train the multiple linear regression model on historical data.
      */
     public function train(Collection $historicalSchedules): void
     {
-        if ($historicalSchedules->count() < 3) {
+        // Require at least 5 samples for reliable training with 3 features + intercept
+        if ($historicalSchedules->count() < 5) {
             return;
         }
 
@@ -35,15 +38,43 @@ class YieldPredictionModel
             }
         }
 
-        if (count($features) < 3) {
+        // Need at least 5 valid samples
+        if (count($features) < 5) {
             return;
         }
 
-        // Perform multiple linear regression
-        $this->multipleLinearRegression($features, $targets);
+        // Identify features with variance and exclude constant features
+        $featureCount = count($features[0]);
+        $this->activeFeatureIndices = [];
 
-        // Calculate R-squared
-        $this->rSquared = $this->calculateRSquared($features, $targets);
+        for ($i = 0; $i < $featureCount; $i++) {
+            $values = array_column($features, $i);
+            $variance = $this->calculateVariance($values);
+            if ($variance >= 1e-6) {
+                $this->activeFeatureIndices[] = $i;
+            }
+        }
+
+        // Need at least one feature with variance
+        if (empty($this->activeFeatureIndices)) {
+            return;
+        }
+
+        // Filter features to only include those with variance
+        $filteredFeatures = [];
+        foreach ($features as $featureRow) {
+            $filteredRow = [];
+            foreach ($this->activeFeatureIndices as $index) {
+                $filteredRow[] = $featureRow[$index];
+            }
+            $filteredFeatures[] = $filteredRow;
+        }
+
+        // Perform multiple linear regression on filtered features
+        $this->multipleLinearRegression($filteredFeatures, $targets);
+
+        // Calculate R-squared using filtered features
+        $this->rSquared = $this->calculateRSquared($filteredFeatures, $targets);
     }
 
     /**
@@ -55,10 +86,16 @@ class YieldPredictionModel
             return 0;
         }
 
+        // Filter features to only include active features (those with variance during training)
+        $filteredFeatures = [];
+        foreach ($this->activeFeatureIndices as $index) {
+            $filteredFeatures[] = $features[$index] ?? 0;
+        }
+
         $prediction = $this->intercept;
 
         foreach ($this->coefficients as $index => $coefficient) {
-            $prediction += $coefficient * ($features[$index] ?? 0);
+            $prediction += $coefficient * $filteredFeatures[$index];
         }
 
         return max(0, $prediction); // Ensure non-negative
@@ -106,22 +143,21 @@ class YieldPredictionModel
         // Calculate days from planting to harvest
         $daysToHarvest = $this->calculateDaysToHarvest($schedule);
 
-        // Calculate seeds per hectare (planting density)
-        $seedsPerHectare = $schedule->seeds_planted / max($schedule->hectares, 0.01);
+        // Calculate seed weight per hectare (planting density)
+        $kgPerHectare = $schedule->seed_weight_kg / max($schedule->hectares, 0.01);
 
         // Store feature names for reference
+        // Note: We don't include hectares as a feature because we're predicting yield PER hectare
         $this->featureNames = [
             'avg_moisture',
             'days_to_harvest',
-            'seeds_per_hectare',
-            'hectares',
+            'kg_per_hectare',
         ];
 
         return [
             $avgMoisture,
             $daysToHarvest,
-            $seedsPerHectare,
-            $schedule->hectares,
+            $kgPerHectare,
         ];
     }
 
@@ -190,6 +226,26 @@ class YieldPredictionModel
         // Extract intercept and coefficients
         $this->intercept = $beta[0];
         $this->coefficients = array_slice($beta, 1);
+    }
+
+    /**
+     * Calculate variance of an array of values.
+     */
+    private function calculateVariance(array $values): float
+    {
+        $n = count($values);
+        if ($n < 2) {
+            return 0;
+        }
+
+        $mean = array_sum($values) / $n;
+        $variance = 0;
+
+        foreach ($values as $value) {
+            $variance += pow($value - $mean, 2);
+        }
+
+        return $variance / $n;
     }
 
     /**

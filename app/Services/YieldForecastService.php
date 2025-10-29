@@ -25,8 +25,8 @@ class YieldForecastService
         // Get historical data for training
         $historicalSchedules = $this->getHistoricalSchedules($schedule);
 
-        // Check if we have enough historical data for ML
-        if ($historicalSchedules->count() >= 3) {
+        // Check if we have enough historical data for ML (need at least 5 for reliable training)
+        if ($historicalSchedules->count() >= 5) {
             return $this->getMLForecast($schedule, $historicalSchedules);
         }
 
@@ -51,6 +51,12 @@ class YieldForecastService
 
         // Make prediction (yield per hectare)
         $predictedYieldPerHectare = $this->model->predict($features);
+
+        // If model didn't train properly (returns 0 or coefficients are empty), fall back to basic forecast
+        if ($predictedYieldPerHectare <= 0 || $this->model->getRSquared() == 0) {
+            return $this->getBasicForecast($schedule);
+        }
+
         $predictedYield = $predictedYieldPerHectare * $schedule->hectares;
 
         // Calculate confidence
@@ -58,9 +64,11 @@ class YieldForecastService
         $confidenceLevel = $this->getConfidenceLevel($confidence);
 
         // Calculate prediction intervals (±1.96 * std for 95% CI)
+        // yieldStdDev is per hectare, so multiply once to get total yield std dev
         $yieldStdDev = $this->calculateYieldStdDev($historicalSchedules);
-        $optimisticYield = $predictedYield + (1.96 * $yieldStdDev * $schedule->hectares);
-        $pessimisticYield = $predictedYield - (1.96 * $yieldStdDev * $schedule->hectares);
+        $totalYieldStdDev = $yieldStdDev * $schedule->hectares;
+        $optimisticYield = $predictedYield + 1.96 * $totalYieldStdDev;
+        $pessimisticYield = $predictedYield - 1.96 * $totalYieldStdDev;
 
         // Calculate environmental factors
         $environmentalFactors = $this->analyzeEnvironmentalFactors($schedule, $features);
@@ -177,10 +185,10 @@ class YieldForecastService
         }
 
         // Planting density analysis
-        $seedsPerHectare = $features[2];
+        $kgPerHectare = $features[2];
         $factors[] = [
             'factor' => 'Planting Density',
-            'impact' => number_format($seedsPerHectare, 0).' seeds/ha',
+            'impact' => number_format($kgPerHectare, 2).' kg/ha',
             'weight' => 25,
             'status' => 'info',
         ];

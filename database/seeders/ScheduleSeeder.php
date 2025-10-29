@@ -101,12 +101,90 @@ class ScheduleSeeder extends Seeder
 
         $schedulesCreated = 0;
 
+        // First, ensure each crop type has at least 5 completed schedules for yield forecasting
+        $minSchedulesPerCropType = 5;
+
+        foreach ($commodities as $commodity) {
+            $commodityName = $commodity->name;
+
+            $growingPeriod = $cropGrowingPeriods[$commodityName] ?? 90;
+            $expectedYieldPerHectare = $averageYields[$commodityName] ?? 10000;
+            $pricePerKg = $averagePrices[$commodityName] ?? 50;
+
+            for ($i = 0; $i < $minSchedulesPerCropType; $i++) {
+                $sensor = $sensors->random();
+
+                // All of these should be completed past plantings
+                $daysOffset = rand(-365, -($growingPeriod + 30)); // Ensure harvest is also past
+
+                $datePlanted = now()->addDays($daysOffset);
+                $expectedHarvestDate = $datePlanted->copy()->addDays($growingPeriod);
+
+                // Randomize farm size (suitable for small sensors)
+                $hectares = round(rand(5, 30) / 10, 1); // 0.5 to 3.0 hectares
+
+                // Calculate seed weight (kg) based on crop type
+                // Seeding rates in kg per hectare
+                $seedWeightPerHectare = match ($commodityName) {
+                    'Rice' => 40.0,
+                    'Corn' => 20.0,
+                    'Tomato' => 0.15,
+                    'Cabbage' => 0.4,
+                    'Cauliflower' => 0.5,
+                    'Broccoli' => 0.4,
+                    'Lettuce' => 0.8,
+                    'Pechay' => 1.5,
+                    'Pechay Baguio' => 1.2,
+                    'Carrots' => 3.0,
+                    'White Potato' => 1800.0,
+                    'Bell Pepper' => 0.3,
+                    'Eggplant' => 0.2,
+                    'Ampalaya' => 3.0,
+                    'Pole Sitao' => 50.0,
+                    'Squash' => 4.0,
+                    'Celery' => 0.5,
+                    'Chayote' => 2.0,
+                    'Habichuelas/Baguio Beans' => 60.0,
+                    default => 5.0,
+                };
+                $seedWeightKg = round($seedWeightPerHectare * $hectares, 2);
+
+                // Calculate expected yield with some variation
+                $expectedYield = round($expectedYieldPerHectare * $hectares * rand(85, 115) / 100, 2);
+
+                // Calculate expected income
+                $expectedIncome = round($expectedYield * $pricePerKg, 2);
+
+                // Add actual harvest data (all are completed)
+                $actualHarvestDate = $expectedHarvestDate->copy()->addDays(rand(-7, 7));
+                $actualYield = round($expectedYield * rand(70, 120) / 100, 2);
+                $actualIncome = round($actualYield * $pricePerKg * rand(90, 110) / 100, 2);
+
+                Schedule::create([
+                    'commodity_id' => $commodity->id,
+                    'sensor_id' => $sensor->id,
+                    'hectares' => $hectares,
+                    'seed_weight_kg' => $seedWeightKg,
+                    'date_planted' => $datePlanted,
+                    'expected_harvest_date' => $expectedHarvestDate,
+                    'actual_harvest_date' => $actualHarvestDate,
+                    'expected_yield' => $expectedYield,
+                    'yield' => $actualYield,
+                    'expected_income' => $expectedIncome,
+                    'income' => $actualIncome,
+                ]);
+
+                $schedulesCreated++;
+            }
+        }
+
+        // Then, add additional random schedules per sensor (some current, some past)
         foreach ($sensors as $sensor) {
-            // Create 10 schedules per sensor (9 past schedules, and maybe 1 current)
-            $schedulesPerSensor = 10;
+            // Create 5 additional schedules per sensor for variety
+            $additionalSchedulesPerSensor = 5;
             $hasCurrentPlanting = rand(0, 1); // 50% chance of having a current planting
 
-            for ($i = 0; $i < $schedulesPerSensor; $i++) {
+            for ($i = 0; $i < $additionalSchedulesPerSensor; $i++) {
                 $commodity = $commodities->random();
                 $commodityName = $commodity->name;
 
@@ -115,7 +193,7 @@ class ScheduleSeeder extends Seeder
                 $pricePerKg = $averagePrices[$commodityName] ?? 50;
 
                 // Determine if this is the current planting (last iteration and has current planting)
-                $isCurrentPlanting = ($i === $schedulesPerSensor - 1) && $hasCurrentPlanting;
+                $isCurrentPlanting = ($i === $additionalSchedulesPerSensor - 1) && $hasCurrentPlanting;
 
                 if ($isCurrentPlanting) {
                     // Current planting: started recently, harvest date in the future
@@ -131,16 +209,31 @@ class ScheduleSeeder extends Seeder
                 // Randomize farm size (suitable for small sensors)
                 $hectares = round(rand(5, 30) / 10, 1); // 0.5 to 3.0 hectares
 
-                // Calculate seeds planted based on crop type
-                $seedsPerHectare = match ($commodityName) {
-                    'Rice' => 40000,
-                    'Corn' => 60000,
-                    'Tomato' => 25000,
-                    'Cabbage', 'Cauliflower', 'Broccoli' => 30000,
-                    'Lettuce', 'Pechay' => 50000,
-                    default => 35000,
+                // Calculate seed weight (kg) based on crop type
+                // Seeding rates in kg per hectare
+                $seedWeightPerHectare = match ($commodityName) {
+                    'Rice' => 40.0,
+                    'Corn' => 20.0,
+                    'Tomato' => 0.15,
+                    'Cabbage' => 0.4,
+                    'Cauliflower' => 0.5,
+                    'Broccoli' => 0.4,
+                    'Lettuce' => 0.8,
+                    'Pechay' => 1.5,
+                    'Pechay Baguio' => 1.2,
+                    'Carrots' => 3.0,
+                    'White Potato' => 1800.0,
+                    'Bell Pepper' => 0.3,
+                    'Eggplant' => 0.2,
+                    'Ampalaya' => 3.0,
+                    'Pole Sitao' => 50.0,
+                    'Squash' => 4.0,
+                    'Celery' => 0.5,
+                    'Chayote' => 2.0,
+                    'Habichuelas/Baguio Beans' => 60.0,
+                    default => 5.0,
                 };
-                $seedsPlanted = (int) ($seedsPerHectare * $hectares);
+                $seedWeightKg = round($seedWeightPerHectare * $hectares, 2);
 
                 // Calculate expected yield with some variation
                 $expectedYield = round($expectedYieldPerHectare * $hectares * rand(85, 115) / 100, 2);
@@ -168,7 +261,7 @@ class ScheduleSeeder extends Seeder
                     'commodity_id' => $commodity->id,
                     'sensor_id' => $sensor->id,
                     'hectares' => $hectares,
-                    'seeds_planted' => $seedsPlanted,
+                    'seed_weight_kg' => $seedWeightKg,
                     'date_planted' => $datePlanted,
                     'expected_harvest_date' => $expectedHarvestDate,
                     'actual_harvest_date' => $actualHarvestDate,
@@ -182,6 +275,6 @@ class ScheduleSeeder extends Seeder
             }
         }
 
-        $this->command->info("Created {$schedulesCreated} planting schedules for {$sensors->count()} sensors.");
+        $this->command->info("Created {$schedulesCreated} planting schedules ({$commodities->count()} crop types × {$minSchedulesPerCropType} = ".($commodities->count() * $minSchedulesPerCropType).' base schedules + '.($sensors->count() * 5).' additional schedules).');
     }
 }

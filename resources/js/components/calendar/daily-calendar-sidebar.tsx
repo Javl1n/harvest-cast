@@ -216,7 +216,7 @@ const DailyCalendarSidebar: React.FC<DailyCalendarSidebarProps> = ({
                                             <div className="text-xs text-muted-foreground truncate">
                                                 {sensor.latest_schedule && (
                                                     <>
-                                                        {sensor.latest_schedule.hectares}ha • {sensor.latest_schedule.seeds_planted} seeds
+                                                        {sensor.latest_schedule.hectares}ha • {sensor.latest_schedule.seed_weight_kg} kg
                                                     </>
                                                 )}
                                             </div>

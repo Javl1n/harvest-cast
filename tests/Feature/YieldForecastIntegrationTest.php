@@ -23,7 +23,7 @@ it('displays yield forecast on sensor detail page for active planting', function
             'commodity_id' => $commodity->id,
             'sensor_id' => $sensor->id,
             'hectares' => 2.5,
-            'seeds_planted' => 50000,
+            'seed_weight_kg' => 2.5,
             'date_planted' => now()->subMonths(12 + $i),
             'expected_harvest_date' => now()->subMonths(9 + $i),
             'actual_harvest_date' => now()->subMonths(9 + $i),

@@ -21,7 +21,7 @@ export const SensorPlantingHistory = ({ schedules }: SensorPlantingHistoryProps)
                             Planted {formatShortDate(schedule.date_planted)}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                            {schedule.hectares}ha • {schedule.seeds_planted.toLocaleString()} seeds
+                            {schedule.hectares}ha • {schedule.seed_weight_kg.toLocaleString()} kg
                         </div>
                     </div>
                 ))}

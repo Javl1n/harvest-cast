@@ -26,6 +26,13 @@ interface YieldForecastCardProps {
 const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
     const [isExpanded, setIsExpanded] = useState(true);
 
+    // Convert kg to tons (divide by 1000)
+    const predictedYieldTons = forecast.predicted_yield / 1000;
+    const expectedYieldTons = forecast.expected_yield ? forecast.expected_yield / 1000 : null;
+    const optimisticYieldTons = forecast.optimistic_yield / 1000;
+    const pessimisticYieldTons = forecast.pessimistic_yield / 1000;
+    const yieldPerHectareTons = forecast.yield_per_hectare / 1000;
+
     // Calculate the variance trend
     const varianceTrend = forecast.variance_from_expected_percent;
     const isPositiveTrend = varianceTrend > 5;
@@ -59,11 +66,11 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
         }
     };
 
-    // Prepare chart data for historical yields
+    // Prepare chart data for historical yields (convert kg to tons)
     const historicalChartData = forecast.historical_yields.map(point => ({
         date: new Date(point.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
-        yield: point.yield,
-        yieldPerHectare: point.yield_per_hectare,
+        yield: point.yield / 1000,
+        yieldPerHectare: point.yield_per_hectare / 1000,
     }));
 
     // Add current prediction to chart
@@ -71,36 +78,36 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
         ...historicalChartData,
         {
             date: 'Predicted',
-            yield: forecast.predicted_yield,
-            yieldPerHectare: forecast.yield_per_hectare,
+            yield: predictedYieldTons,
+            yieldPerHectare: yieldPerHectareTons,
             isPrediction: true,
         },
     ];
 
-    // Prepare data for yield comparison bar chart
+    // Prepare data for yield comparison bar chart (in tons)
     const comparisonData = [
         {
             name: 'Pessimistic',
-            value: forecast.pessimistic_yield,
+            value: pessimisticYieldTons,
             color: '#ef4444', // red-500
         },
         {
             name: 'Predicted',
-            value: forecast.predicted_yield,
+            value: predictedYieldTons,
             color: '#8b5cf6', // purple-500
         },
         {
             name: 'Optimistic',
-            value: forecast.optimistic_yield,
+            value: optimisticYieldTons,
             color: '#10b981', // green-500
         },
     ];
 
     // Add expected if available
-    if (forecast.expected_yield) {
+    if (expectedYieldTons) {
         comparisonData.push({
             name: 'Expected',
-            value: forecast.expected_yield,
+            value: expectedYieldTons,
             color: '#6b7280', // gray-500
         });
     }
@@ -137,9 +144,9 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                     <div className="mt-2 flex items-center gap-4 text-xs">
                         <div>
                             <span className="text-muted-foreground">Predicted: </span>
-                            <span className="font-semibold">{forecast.predicted_yield.toFixed(2)} tons</span>
+                            <span className="font-semibold">{predictedYieldTons.toFixed(2)} tons</span>
                         </div>
-                        {forecast.expected_yield && (
+                        {expectedYieldTons && (
                             <div className="flex items-center gap-1">
                                 {isPositiveTrend ? (
                                     <TrendingUp className="h-3 w-3 text-green-600" />
@@ -165,19 +172,19 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                         <div className="p-3 bg-muted/30 rounded-lg">
                             <div className="text-xs text-muted-foreground mb-1">AI Predicted Yield</div>
                             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                                {forecast.predicted_yield.toFixed(2)}
+                                {predictedYieldTons.toFixed(2)}
                             </div>
                             <div className="text-xs text-muted-foreground">tons</div>
                             <div className="text-xs mt-1 text-muted-foreground">
-                                {forecast.yield_per_hectare.toFixed(2)} tons/ha
+                                {yieldPerHectareTons.toFixed(2)} tons/ha
                             </div>
                         </div>
 
-                        {forecast.expected_yield ? (
+                        {expectedYieldTons ? (
                             <div className="p-3 bg-muted/30 rounded-lg">
                                 <div className="text-xs text-muted-foreground mb-1">Expected Yield</div>
                                 <div className="text-2xl font-bold">
-                                    {forecast.expected_yield.toFixed(2)}
+                                    {expectedYieldTons.toFixed(2)}
                                 </div>
                                 <div className="text-xs text-muted-foreground">tons</div>
                                 <div className="flex items-center gap-1 mt-1">
@@ -247,7 +254,7 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                                                         <div className="bg-background border border-border rounded-lg p-2 shadow-lg">
                                                             <div className="text-xs font-semibold">{payload[0].payload.name}</div>
                                                             <div className="text-xs text-muted-foreground">
-                                                                {payload[0].value?.toFixed(2)} tons
+                                                                {Number(payload[0].value).toFixed(2)} tons
                                                             </div>
                                                         </div>
                                                     );
@@ -295,10 +302,10 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                                                         <div className="bg-background border border-border rounded-lg p-2 shadow-lg">
                                                             <div className="text-xs font-semibold">{payload[0].payload.date}</div>
                                                             <div className="text-xs text-muted-foreground">
-                                                                Total: {payload[0].value?.toFixed(2)} tons
+                                                                Total: {Number(payload[0].value).toFixed(2)} tons
                                                             </div>
                                                             <div className="text-xs text-muted-foreground">
-                                                                Per hectare: {payload[0].payload.yieldPerHectare?.toFixed(2)} tons/ha
+                                                                Per hectare: {Number(payload[0].payload.yieldPerHectare).toFixed(2)} tons/ha
                                                             </div>
                                                             {payload[0].payload.isPrediction && (
                                                                 <Badge className="text-xs mt-1 bg-purple-100 text-purple-800">

@@ -84,8 +84,8 @@ export const SensorCurrentPlanting = ({
                             <div className="font-medium">{latestSchedule.hectares}ha</div>
                         </div>
                         <div>
-                            <div className="text-muted-foreground">Seeds</div>
-                            <div className="font-medium">{latestSchedule.seeds_planted.toLocaleString()}</div>
+                            <div className="text-muted-foreground">Seeds (kg)</div>
+                            <div className="font-medium">{latestSchedule.seed_weight_kg.toLocaleString()} kg</div>
                         </div>
                         <div>
                             <div className="text-muted-foreground">Expected Harvest</div>
@@ -99,7 +99,7 @@ export const SensorCurrentPlanting = ({
                         <div>
                             <div className="text-muted-foreground">Expected Income</div>
                             <div className="font-medium">
-                                ${latestSchedule.expected_income?.toLocaleString() || '0'}
+                                ₱{latestSchedule.expected_income?.toLocaleString() || '0'}
                             </div>
                         </div>
                     </div>

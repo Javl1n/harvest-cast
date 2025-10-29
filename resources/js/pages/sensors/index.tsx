@@ -189,8 +189,8 @@ const SensorsIndex = () => {
                                                                       <div className="font-semibold text-base">{sensor.latest_schedule.hectares ?? 0} ha</div>
                                                                  </div>
                                                                  <div>
-                                                                      <div className="text-muted-foreground text-xs mb-1">Seeds</div>
-                                                                      <div className="font-semibold text-base">{sensor.latest_schedule.seeds_planted?.toLocaleString() ?? '0'}</div>
+                                                                      <div className="text-muted-foreground text-xs mb-1">Seeds (kg)</div>
+                                                                      <div className="font-semibold text-base">{sensor.latest_schedule.seed_weight_kg?.toLocaleString() ?? '0'} kg</div>
                                                                  </div>
                                                                  <div>
                                                                       <div className="text-muted-foreground text-xs mb-1">Harvest</div>
@@ -203,7 +203,7 @@ const SensorsIndex = () => {
                                                                  </div>
                                                                  <div>
                                                                       <div className="text-muted-foreground text-xs mb-1">Income</div>
-                                                                      <div className="font-semibold text-base">${sensor.latest_schedule.expected_income?.toLocaleString() ?? '0'}</div>
+                                                                      <div className="font-semibold text-base">₱{sensor.latest_schedule.expected_income?.toLocaleString() ?? '0'}</div>
                                                                  </div>
                                                             </div>
                                                        )}

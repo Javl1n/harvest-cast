@@ -83,7 +83,7 @@ class CalendarPageController extends Controller
             'commodity_id' => 'required|exists:commodities,id',
             'sensor_id' => 'required|exists:sensors,id',
             'hectares' => 'required|numeric|min:0.01',
-            'seeds_planted' => 'required|integer|min:1',
+            'seed_weight_kg' => 'required|numeric|min:0.01',
             'date_planted' => 'required|date',
             'expected_harvest_date' => 'required|date|after:date_planted',
         ]);
