@@ -10,6 +10,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { ImperativePanelGroupHandle } from 'react-resizable-panels';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { MapProvider } from 'react-map-gl/mapbox';
 
 interface AppLayoutProps {
     children?: ReactNode;
@@ -48,29 +49,31 @@ export default ({ children, breadcrumbs, hidden = false, ...props }: AppLayoutPr
 
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-            <div className="h-full w-full hidden lg:block">
-                <ResizablePanelGroup 
-                    ref={panelGroupRef}
-                    direction='horizontal' 
-                    className="w-full absolute pointer-events-none z-50 h-full p-3"
-                    onLayout={handlePanelLayout}
-                >
-                    <ResizablePanel defaultSize={savedSize} className="">
-                        <div className="h-full w-full pointer-events-auto overflow-auto bg-background/90 backdrop-blur-md rounded-lg">
-                            {children}
+            <MapProvider>
+                <div className="h-full w-full hidden lg:block">
+                    <ResizablePanelGroup
+                        ref={panelGroupRef}
+                        direction='horizontal'
+                        className="w-full absolute pointer-events-none z-50 h-full p-3"
+                        onLayout={handlePanelLayout}
+                    >
+                        <ResizablePanel defaultSize={savedSize} className="">
+                            <div className="h-full w-full pointer-events-auto overflow-auto bg-background/90 backdrop-blur-md rounded-lg">
+                                {children}
+                            </div>
+                        </ResizablePanel>
+                        <ResizableHandle withHandle hidden={hidden} className='my-auto' />
+                        <ResizablePanel defaultSize={100 - savedSize} />
+                    </ResizablePanelGroup>
+                    <div className='flex gap-3 absolute top-4 right-4 z-50 pointer-events-none'>
+                        <div className='pointer-events-auto'>
+                            <WeatherWidget weather={weather} />
                         </div>
-                    </ResizablePanel>
-                    <ResizableHandle withHandle hidden={hidden} className='my-auto' />
-                    <ResizablePanel defaultSize={100 - savedSize} />
-                </ResizablePanelGroup>
-                <div className='flex gap-3 absolute top-4 right-4 z-50 pointer-events-none'>
-                    <div className='pointer-events-auto'>
-                        <WeatherWidget weather={weather} />
+                        <SidebarTrigger className='bg-card/95 pointer-events-auto' />
                     </div>
-                    <SidebarTrigger className='bg-card/95 pointer-events-auto' />
+                    <AppMap  />
                 </div>
-                <AppMap  />
-            </div>
+            </MapProvider>
             <div className='lg:hidden'>
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 {children}

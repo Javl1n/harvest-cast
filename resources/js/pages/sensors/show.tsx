@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useMap } from "react-map-gl/mapbox";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,14 +27,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const SensorsShow = () => {
-     const {sensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast} = usePage<{
+     const {sensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, auth} = usePage<{
          sensor: SensorInterface;
          careRecommendations: CropCareRecommendation[];
          currentConditions: CurrentConditions | null;
          hasCareRecommendations: boolean;
          yieldForecast: YieldForecast | null;
+         auth: { user: { id: number; name: string; email: string; role: 'admin' | 'farmer' } | null };
      }>().props;
      useSetPanelSize(30);
+
+     const {appMap} = useMap();
+
+     appMap?.flyTo({
+          center: [sensor.latest_reading.longitude, sensor.latest_reading.latitude]
+     })
 
      const { patch, processing } = useForm();
 
@@ -72,6 +80,7 @@ const SensorsShow = () => {
      const latestSchedule = sensor.latest_schedule;
      const isCurrentPlantingHarvested = latestSchedule?.actual_harvest_date ? true : false;
      const canPlantNew = !hasPlantings || isCurrentPlantingHarvested;
+     const isAdmin = auth?.user?.role === 'admin';
 
 
      return (
@@ -189,20 +198,22 @@ const SensorsShow = () => {
                                                   Planted {formatShortDate(latestSchedule.date_planted)}
                                              </p>
                                         </div>
-                                        <div className="flex gap-2">
-                                             <Button
-                                                  size="sm"
-                                                  variant="outline"
-                                                  className="text-xs h-7"
-                                                  onClick={handleHarvest}
-                                                  disabled={processing}
-                                             >
-                                                  {processing ? 'Harvesting...' : 'Mark Harvested'}
-                                             </Button>
-                                             <Button size="sm" className="text-xs h-7" disabled>
-                                                  Harvest First
-                                             </Button>
-                                        </div>
+                                        {isAdmin && (
+                                             <div className="flex gap-2">
+                                                  <Button
+                                                       size="sm"
+                                                       variant="outline"
+                                                       className="text-xs h-7"
+                                                       onClick={handleHarvest}
+                                                       disabled={processing}
+                                                  >
+                                                       {processing ? 'Harvesting...' : 'Mark Harvested'}
+                                                  </Button>
+                                                  <Button size="sm" className="text-xs h-7" disabled>
+                                                       Harvest First
+                                                  </Button>
+                                             </div>
+                                        )}
                                    </div>
 
                                    <div className="grid grid-cols-2 gap-2 text-xs">
@@ -251,12 +262,14 @@ const SensorsShow = () => {
                                              : 'This sensor is ready for a new planting.'
                                         }
                                    </p>
-                                   <Link href={crops.create(sensor)}>
-                                        <Button size="sm" className="text-xs">
-                                             <Wheat className="h-3 w-3 mr-1" />
-                                             Plant Crop
-                                        </Button>
-                                   </Link>
+                                   {isAdmin && (
+                                        <Link href={crops.create(sensor)}>
+                                             <Button size="sm" className="text-xs">
+                                                  <Wheat className="h-3 w-3 mr-1" />
+                                                  Plant Crop
+                                             </Button>
+                                        </Link>
+                                   )}
                               </div>
                          )}
                     </div>

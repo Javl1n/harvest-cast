@@ -32,6 +32,7 @@ class CalendarPageController extends Controller
      */
     public function create(Sensor $sensor, CropRecommendationService $cropService)
     {
+        $this->authorize('create', Schedule::class);
         $latestReading = $sensor->latestReading;
         $recommendations = [];
         $currentConditions = null;
@@ -76,6 +77,8 @@ class CalendarPageController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Schedule::class);
+
         $validated = $request->validate([
             'commodity_id' => 'required|exists:commodities,id',
             'sensor_id' => 'required|exists:sensors,id',
@@ -214,6 +217,8 @@ class CalendarPageController extends Controller
      */
     public function harvest(Schedule $schedule)
     {
+        $this->authorize('update', $schedule);
+
         $schedule->update([
             'actual_harvest_date' => now(),
         ]);

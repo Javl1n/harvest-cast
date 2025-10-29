@@ -15,11 +15,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->route('calendar.index');
     })->name('dashboard');
 
-    // Route::prefix('/sensors')->name('sensors.')->controller(SensorController::class)
-    // ->group(function () {
-    //     Route::get('/', 'index')->name('index');
-    // });
-
     Route::prefix('/calendar')->name('calendar.')->controller(CalendarPageController::class)
         ->group(function () {
             Route::get('/', 'index')->name('index');
@@ -27,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
     Route::prefix('/crops')->name('crops.')->controller(CalendarPageController::class)
+        ->middleware('admin')
         ->group(function () {
             Route::get('/create/sensor/{sensor}', 'create')->name('create');
             Route::post('/', 'store')->name('store');
