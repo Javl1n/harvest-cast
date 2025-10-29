@@ -82,17 +82,17 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
         {
             name: 'Pessimistic',
             value: forecast.pessimistic_yield,
-            color: 'hsl(var(--destructive))',
+            color: '#ef4444', // red-500
         },
         {
             name: 'Predicted',
             value: forecast.predicted_yield,
-            color: 'hsl(var(--primary))',
+            color: '#8b5cf6', // purple-500
         },
         {
             name: 'Optimistic',
             value: forecast.optimistic_yield,
-            color: 'hsl(var(--chart-2))',
+            color: '#10b981', // green-500
         },
     ];
 
@@ -101,7 +101,7 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
         comparisonData.push({
             name: 'Expected',
             value: forecast.expected_yield,
-            color: 'hsl(var(--muted-foreground))',
+            color: '#6b7280', // gray-500
         });
     }
 
@@ -227,9 +227,19 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                             <div className="h-32">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={comparisonData} layout="vertical">
-                                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                                        <XAxis type="number" className="text-xs" />
-                                        <YAxis dataKey="name" type="category" className="text-xs" width={80} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis
+                                            type="number"
+                                            tick={{ fill: '#6b7280', fontSize: 11 }}
+                                            stroke="#9ca3af"
+                                        />
+                                        <YAxis
+                                            dataKey="name"
+                                            type="category"
+                                            width={80}
+                                            tick={{ fill: '#6b7280', fontSize: 11 }}
+                                            stroke="#9ca3af"
+                                        />
                                         <ChartTooltip
                                             content={({ active, payload }) => {
                                                 if (active && payload && payload.length) {
@@ -268,15 +278,15 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                             <div className="h-40">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={chartDataWithPrediction}>
-                                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                                         <XAxis
                                             dataKey="date"
-                                            className="text-xs"
-                                            tick={{ fontSize: 10 }}
+                                            tick={{ fill: '#6b7280', fontSize: 10 }}
+                                            stroke="#9ca3af"
                                         />
                                         <YAxis
-                                            className="text-xs"
-                                            tick={{ fontSize: 10 }}
+                                            tick={{ fill: '#6b7280', fontSize: 10 }}
+                                            stroke="#9ca3af"
                                         />
                                         <ChartTooltip
                                             content={({ active, payload }) => {
@@ -304,9 +314,9 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                                         <Line
                                             type="monotone"
                                             dataKey="yield"
-                                            stroke="hsl(var(--primary))"
+                                            stroke="#8b5cf6"
                                             strokeWidth={2}
-                                            dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+                                            dot={{ fill: '#8b5cf6', r: 4 }}
                                             activeDot={{ r: 6 }}
                                         />
                                     </LineChart>

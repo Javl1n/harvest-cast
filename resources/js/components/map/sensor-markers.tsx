@@ -1,9 +1,8 @@
-import { CircleDot, CircleDotDashed, MapPin } from "lucide-react";
+import { CircleDot } from "lucide-react";
 import { Marker } from "react-map-gl/mapbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { useAtomValue } from 'jotai';
-import { SensorsObject } from "./sensors";
-import { markerSensorActionAtom } from "@/atoms/map-atoms";
+import { router } from "@inertiajs/react";
+import calendar from "@/routes/calendar";
 
 export interface SensorMarkerInterface {
      uuid: string;
@@ -14,20 +13,22 @@ export interface SensorMarkerInterface {
 };
 
 
-export default function SensorMarker({sensor}: {sensor: SensorMarkerInterface}) 
+export default function SensorMarker({sensor}: {sensor: SensorMarkerInterface})
 {
-     const markerAction = useAtomValue(markerSensorActionAtom);
+     const handleMarkerClick = () => {
+          router.visit(calendar.show(sensor.uuid).url);
+     };
 
      return (
           <Marker
-               onClick={() => markerAction(sensor.uuid)}
+               onClick={handleMarkerClick}
                longitude={sensor.longitude}
                latitude={sensor.latitude}
                anchor="center"
-          > 
+          >
                <Tooltip>
                     <TooltipTrigger asChild>
-                         <CircleDot className="size-10 stroke-3 transition" style={{
+                         <CircleDot className="size-10 stroke-3 transition cursor-pointer" style={{
                               color: `hsl(${(sensor.moisture / 100) * 120}, 100%, 50%)`
                          }} />
                     </TooltipTrigger>

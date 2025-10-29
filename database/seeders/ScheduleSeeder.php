@@ -102,8 +102,9 @@ class ScheduleSeeder extends Seeder
         $schedulesCreated = 0;
 
         foreach ($sensors as $sensor) {
-            // Create 2-4 schedules per sensor (some past, some current, some future)
-            $schedulesPerSensor = rand(2, 4);
+            // Create 10 schedules per sensor (9 past schedules, and maybe 1 current)
+            $schedulesPerSensor = 10;
+            $hasCurrentPlanting = rand(0, 1); // 50% chance of having a current planting
 
             for ($i = 0; $i < $schedulesPerSensor; $i++) {
                 $commodity = $commodities->random();
@@ -113,8 +114,17 @@ class ScheduleSeeder extends Seeder
                 $expectedYieldPerHectare = $averageYields[$commodityName] ?? 10000;
                 $pricePerKg = $averagePrices[$commodityName] ?? 50;
 
-                // Randomize planting dates (past 180 days to future 90 days)
-                $daysOffset = rand(-180, 90);
+                // Determine if this is the current planting (last iteration and has current planting)
+                $isCurrentPlanting = ($i === $schedulesPerSensor - 1) && $hasCurrentPlanting;
+
+                if ($isCurrentPlanting) {
+                    // Current planting: started recently, harvest date in the future
+                    $daysOffset = rand(-30, -1); // Planted 1-30 days ago
+                } else {
+                    // Past plantings: both planting and harvest dates are in the past
+                    $daysOffset = rand(-365, -($growingPeriod + 30)); // Ensure harvest is also past
+                }
+
                 $datePlanted = now()->addDays($daysOffset);
                 $expectedHarvestDate = $datePlanted->copy()->addDays($growingPeriod);
 
@@ -138,12 +148,12 @@ class ScheduleSeeder extends Seeder
                 // Calculate expected income
                 $expectedIncome = round($expectedYield * $pricePerKg, 2);
 
-                // For past plantings, add actual harvest data
+                // For past plantings (completed harvests), add actual harvest data
                 $actualHarvestDate = null;
                 $actualYield = null;
                 $actualIncome = null;
 
-                if ($datePlanted->isPast() && $expectedHarvestDate->isPast()) {
+                if (! $isCurrentPlanting && $expectedHarvestDate->isPast()) {
                     // Add some variation to actual harvest date (±7 days)
                     $actualHarvestDate = $expectedHarvestDate->copy()->addDays(rand(-7, 7));
 
