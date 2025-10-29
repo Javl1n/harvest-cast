@@ -1,4 +1,5 @@
 import { useSetPanelSize } from "@/hooks/use-set-panel-size";
+import { useFlyToLocation } from "@/hooks/useFlyToLocation";
 import AppLayout from "@/layouts/app-layout";
 import crops from "@/routes/crops";
 import calendar from "@/routes/calendar";
@@ -17,7 +18,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useMap } from "react-map-gl/mapbox";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,11 +37,15 @@ const SensorsShow = () => {
      }>().props;
      useSetPanelSize(30);
 
-     const {appMap} = useMap();
-
-     appMap?.flyTo({
-          center: [sensor.latest_reading.longitude, sensor.latest_reading.latitude]
-     })
+     useFlyToLocation(
+          sensor.latest_reading?.latitude,
+          sensor.latest_reading?.longitude,
+          {
+               zoom: 18,
+               duration: 1500,
+               offset: [window.innerWidth * 0.15, 0]
+          }
+     );
 
      const { patch, processing } = useForm();
 
