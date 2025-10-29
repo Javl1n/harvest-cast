@@ -2,10 +2,11 @@ import { useSetPanelSize } from "@/hooks/use-set-panel-size";
 import { useFlyToLocation } from "@/hooks/useFlyToLocation";
 import AppLayout from "@/layouts/app-layout";
 import calendar from "@/routes/calendar";
-import { BreadcrumbItem, SensorInterface, CropCareRecommendation, CurrentConditions, YieldForecast } from "@/types";
+import { BreadcrumbItem, SensorInterface, CropCareRecommendation, CurrentConditions, YieldForecast, IncomeForecast } from "@/types";
 import { Head, usePage } from "@inertiajs/react";
 import CropCareRecommendations from "@/components/crop-care-recommendations";
 import YieldForecastCard from "@/components/yield-forecast-card";
+import IncomeForecastCard from "@/components/income-forecast-card";
 import { SensorHeader } from "@/components/calendar/show/sensor-header";
 import { SensorCurrentStatus } from "@/components/calendar/show/sensor-current-status";
 import { SensorQuickStats } from "@/components/calendar/show/sensor-quick-stats";
@@ -23,12 +24,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const SensorsShow = () => {
-     const {sensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, auth} = usePage<{
+     const {sensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, incomeForecast, auth} = usePage<{
          sensor: SensorInterface;
          careRecommendations: CropCareRecommendation[];
          currentConditions: CurrentConditions | null;
          hasCareRecommendations: boolean;
          yieldForecast: YieldForecast | null;
+         incomeForecast: IncomeForecast | null;
          auth: { user: { id: number; name: string; email: string; role: 'admin' | 'farmer' } | null };
      }>().props;
      useSetPanelSize(30);
@@ -87,6 +89,14 @@ const SensorsShow = () => {
                     {yieldForecast && !isCurrentPlantingHarvested && (
                          <YieldForecastCard
                               forecast={yieldForecast}
+                              cropName={latestSchedule?.commodity?.name}
+                         />
+                    )}
+
+                    {/* Income Forecast */}
+                    {incomeForecast && !isCurrentPlantingHarvested && (
+                         <IncomeForecastCard
+                              forecast={incomeForecast}
                               cropName={latestSchedule?.commodity?.name}
                          />
                     )}

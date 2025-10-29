@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Sensor;
 use App\Models\Weather;
 use App\Services\CropRecommendationService;
+use App\Services\IncomeForecastService;
 use App\Services\YieldForecastService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -97,13 +98,14 @@ class CalendarPageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Sensor $sensor, YieldForecastService $yieldForecastService)
+    public function show(Sensor $sensor, YieldForecastService $yieldForecastService, IncomeForecastService $incomeForecastService)
     {
         $latestReading = $sensor->latestReading;
         $latestSchedule = $sensor->latestSchedule;
         $careRecommendations = [];
         $currentConditions = null;
         $yieldForecast = null;
+        $incomeForecast = null;
 
         if ($latestReading) {
             // Get latest weather with caching
@@ -139,6 +141,7 @@ class CalendarPageController extends Controller
         // Get yield forecast for active planting
         if ($latestSchedule && ! $latestSchedule->actual_harvest_date) {
             $yieldForecast = $yieldForecastService->getForecast($latestSchedule);
+            $incomeForecast = $incomeForecastService->getForecast($latestSchedule);
         }
 
         return inertia()->render('sensors/show', [
@@ -147,6 +150,7 @@ class CalendarPageController extends Controller
             'currentConditions' => $currentConditions,
             'hasCareRecommendations' => ! empty($careRecommendations),
             'yieldForecast' => $yieldForecast,
+            'incomeForecast' => $incomeForecast,
         ]);
     }
 

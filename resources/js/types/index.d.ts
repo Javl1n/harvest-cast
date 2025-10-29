@@ -166,3 +166,51 @@ export interface HistoricalYieldPoint {
     yield_per_hectare: number;
     hectares: number;
 }
+
+export interface IncomeForecast {
+    predicted_income: number;
+    optimistic_income: number;
+    pessimistic_income: number;
+    expected_income?: number;
+    income_per_hectare: number;
+    confidence: 'high' | 'medium' | 'low';
+    confidence_score: number;
+    variance_from_expected?: number;
+    variance_from_expected_percent?: number;
+    harvest_date: string;
+    days_until_harvest: number;
+    yield_component: {
+        predicted_yield: number;
+        optimistic_yield: number;
+        pessimistic_yield: number;
+        confidence: 'high' | 'medium' | 'low';
+        confidence_score: number;
+        model_type: 'ml_regression' | 'basic_estimate';
+    };
+    price_component: {
+        forecast_price: number;
+        optimistic_price: number;
+        pessimistic_price: number;
+        current_price: number;
+        trend: 'increasing' | 'decreasing' | 'stable';
+        confidence: 'high' | 'medium' | 'low';
+        confidence_score: number;
+        price_volatility: number;
+    };
+    yield_factors: EnvironmentalFactor[];
+    historical_income: HistoricalIncomePoint[];
+    calculation_breakdown: {
+        formula: string;
+        yield_kg: number;
+        price_per_kg: number;
+        result: number;
+    };
+}
+
+export interface HistoricalIncomePoint {
+    harvest_date: string;
+    income: number;
+    income_per_hectare: number;
+    yield: number;
+    hectares: number;
+}
