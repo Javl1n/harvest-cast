@@ -91,7 +91,7 @@ export interface ScheduleInterface {
     id: number;
     commodity_id: number;
     sensor_id: string;
-    hectares: number;
+    acres: number;
     seed_weight_kg: number;
     date_planted: string;
     expected_harvest_date?: string;
@@ -140,7 +140,7 @@ export interface YieldForecast {
     expected_yield?: number;
     optimistic_yield: number;
     pessimistic_yield: number;
-    yield_per_hectare: number;
+    yield_per_acre: number;
     confidence: 'high' | 'medium' | 'low';
     confidence_score: number;
     r_squared: number;
@@ -163,8 +163,8 @@ export interface EnvironmentalFactor {
 export interface HistoricalYieldPoint {
     date: string;
     yield: number;
-    yield_per_hectare: number;
-    hectares: number;
+    yield_per_acre: number;
+    acres: number;
 }
 
 export interface IncomeForecast {
@@ -172,7 +172,7 @@ export interface IncomeForecast {
     optimistic_income: number;
     pessimistic_income: number;
     expected_income?: number;
-    income_per_hectare: number;
+    income_per_acre: number;
     confidence: 'high' | 'medium' | 'low';
     confidence_score: number;
     variance_from_expected?: number;
@@ -210,7 +210,7 @@ export interface IncomeForecast {
 export interface HistoricalIncomePoint {
     harvest_date: string;
     income: number;
-    income_per_hectare: number;
+    income_per_acre: number;
     yield: number;
-    hectares: number;
+    acres: number;
 }

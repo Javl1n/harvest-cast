@@ -49,26 +49,37 @@ class YieldForecastService
             return $this->getBasicForecast($schedule);
         }
 
-        // Make prediction (yield per hectare)
-        $predictedYieldPerHectare = $this->model->predict($features);
+        // Make prediction (yield per acre)
+        $predictedYieldPerAcre = $this->model->predict($features);
 
         // If model didn't train properly (returns 0 or coefficients are empty), fall back to basic forecast
-        if ($predictedYieldPerHectare <= 0 || $this->model->getRSquared() == 0) {
+        if ($predictedYieldPerAcre <= 0 || $this->model->getRSquared() == 0) {
             return $this->getBasicForecast($schedule);
         }
 
-        $predictedYield = $predictedYieldPerHectare * $schedule->hectares;
+        $predictedYield = $predictedYieldPerAcre * $schedule->acres;
+
+        // Apply yield bounds if user has provided expected_yield to prevent unrealistic predictions
+        if ($schedule->expected_yield && $schedule->expected_yield > 0) {
+            $predictedYield = $this->applyYieldBounds($predictedYield, $schedule->expected_yield, $historicalSchedules);
+        }
 
         // Calculate confidence
         $confidence = $this->model->getConfidence($historicalSchedules->count());
         $confidenceLevel = $this->getConfidenceLevel($confidence);
 
         // Calculate prediction intervals (±1.96 * std for 95% CI)
-        // yieldStdDev is per hectare, so multiply once to get total yield std dev
+        // yieldStdDev is per acre, so multiply once to get total yield std dev
         $yieldStdDev = $this->calculateYieldStdDev($historicalSchedules);
-        $totalYieldStdDev = $yieldStdDev * $schedule->hectares;
+        $totalYieldStdDev = $yieldStdDev * $schedule->acres;
         $optimisticYield = $predictedYield + 1.96 * $totalYieldStdDev;
         $pessimisticYield = $predictedYield - 1.96 * $totalYieldStdDev;
+
+        // Also apply bounds to optimistic/pessimistic if needed
+        if ($schedule->expected_yield && $schedule->expected_yield > 0) {
+            $optimisticYield = min($optimisticYield, $schedule->expected_yield * 1.5);
+            $pessimisticYield = max($pessimisticYield, $schedule->expected_yield * 0.5);
+        }
 
         // Calculate environmental factors
         $environmentalFactors = $this->analyzeEnvironmentalFactors($schedule, $features);
@@ -90,7 +101,7 @@ class YieldForecastService
             'expected_yield' => $schedule->expected_yield,
             'optimistic_yield' => round(max(0, $optimisticYield), 2),
             'pessimistic_yield' => round(max(0, $pessimisticYield), 2),
-            'yield_per_hectare' => round($predictedYieldPerHectare, 2),
+            'yield_per_acre' => round($predictedYieldPerAcre, 2),
             'confidence' => $confidenceLevel,
             'confidence_score' => round($confidence * 100, 1),
             'r_squared' => round($this->model->getRSquared(), 3),
@@ -109,14 +120,14 @@ class YieldForecastService
      */
     private function getBasicForecast(Schedule $schedule): array
     {
-        $expectedYield = $schedule->expected_yield ?? ($schedule->hectares * 3);
+        $expectedYield = $schedule->expected_yield ?? ($schedule->acres * 1.21); // ~3000 kg per hectare = ~1214 kg per acre
 
         return [
             'predicted_yield' => $expectedYield,
             'expected_yield' => $schedule->expected_yield ?? $expectedYield,
             'optimistic_yield' => round($expectedYield * 1.15, 2),
             'pessimistic_yield' => round($expectedYield * 0.85, 2),
-            'yield_per_hectare' => round($expectedYield / max($schedule->hectares, 0.01), 2),
+            'yield_per_acre' => round($expectedYield / max($schedule->acres, 0.01), 2),
             'confidence' => 'low',
             'confidence_score' => 30,
             'r_squared' => 0,
@@ -185,10 +196,10 @@ class YieldForecastService
         }
 
         // Planting density analysis
-        $kgPerHectare = $features[2];
+        $kgPerAcre = $features[2];
         $factors[] = [
             'factor' => 'Planting Density',
-            'impact' => number_format($kgPerHectare, 2).' kg/ha',
+            'impact' => number_format($kgPerAcre, 2).' kg/acre',
             'weight' => 25,
             'status' => 'info',
         ];
@@ -238,8 +249,8 @@ class YieldForecastService
             return [
                 'date' => $schedule->actual_harvest_date->format('Y-m-d'),
                 'yield' => round($schedule->yield, 2),
-                'yield_per_hectare' => round($schedule->yield / max($schedule->hectares, 0.01), 2),
-                'hectares' => $schedule->hectares,
+                'yield_per_acre' => round($schedule->yield / max($schedule->acres, 0.01), 2),
+                'acres' => $schedule->acres,
             ];
         })->reverse()->values()->toArray();
     }
@@ -249,14 +260,14 @@ class YieldForecastService
      */
     private function calculateYieldStdDev(Collection $historicalSchedules): float
     {
-        $yieldsPerHectare = $historicalSchedules->map(function ($schedule) {
-            return $schedule->yield / max($schedule->hectares, 0.01);
+        $yieldsPerAcre = $historicalSchedules->map(function ($schedule) {
+            return $schedule->yield / max($schedule->acres, 0.01);
         })->toArray();
 
-        $mean = array_sum($yieldsPerHectare) / count($yieldsPerHectare);
+        $mean = array_sum($yieldsPerAcre) / count($yieldsPerAcre);
         $variance = array_sum(array_map(function ($x) use ($mean) {
             return pow($x - $mean, 2);
-        }, $yieldsPerHectare)) / count($yieldsPerHectare);
+        }, $yieldsPerAcre)) / count($yieldsPerAcre);
 
         return sqrt($variance);
     }
@@ -311,5 +322,31 @@ class YieldForecastService
         $harvestDate = Carbon::parse($schedule->expected_harvest_date);
 
         return max(0, (int) $now->diffInDays($harvestDate, false));
+    }
+
+    /**
+     * Apply yield bounds to prevent unrealistic predictions
+     * Caps ML predictions to be within reasonable range of farmer's expectation
+     */
+    private function applyYieldBounds(float $predictedYield, float $expectedYield, Collection $historicalSchedules): float
+    {
+        // Calculate historical average for context
+        $historicalAvg = $historicalSchedules->avg('yield');
+
+        // If ML prediction is more than 50% higher than expected, cap it
+        // This respects farmer knowledge while still showing ML can be optimistic
+        $maxAllowedYield = $expectedYield * 1.5; // 50% above expected
+        $minAllowedYield = $expectedYield * 0.5; // 50% below expected
+
+        // If we have good historical data, also consider that
+        if ($historicalAvg > 0) {
+            // Don't allow predictions to exceed historical average by more than 30%
+            $maxAllowedYield = min($maxAllowedYield, $historicalAvg * 1.3);
+            // Don't allow predictions below 70% of historical average
+            $minAllowedYield = max($minAllowedYield, $historicalAvg * 0.7);
+        }
+
+        // Clamp the prediction within bounds
+        return max($minAllowedYield, min($maxAllowedYield, $predictedYield));
     }
 }

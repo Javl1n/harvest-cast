@@ -81,7 +81,7 @@ export const SensorCurrentPlanting = ({
                     <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
                             <div className="text-muted-foreground">Area</div>
-                            <div className="font-medium">{latestSchedule.hectares}ha</div>
+                            <div className="font-medium">{latestSchedule.acres} acres</div>
                         </div>
                         <div>
                             <div className="text-muted-foreground">Seeds (kg)</div>

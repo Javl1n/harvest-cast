@@ -54,9 +54,9 @@ class IncomeForecastService
         $optimisticIncome = $yieldForecast['optimistic_yield'] * $priceForecast['optimistic_price'];
         $pessimisticIncome = $yieldForecast['pessimistic_yield'] * $priceForecast['pessimistic_price'];
 
-        // Calculate income per hectare
-        $incomePerHectare = $schedule->hectares > 0
-            ? $predictedIncome / $schedule->hectares
+        // Calculate income per acre
+        $incomePerAcre = $schedule->acres > 0
+            ? $predictedIncome / $schedule->acres
             : $predictedIncome;
 
         // Combined confidence (average of yield and price confidence scores)
@@ -79,7 +79,7 @@ class IncomeForecastService
             'optimistic_income' => round($optimisticIncome, 2),
             'pessimistic_income' => round($pessimisticIncome, 2),
             'expected_income' => $schedule->expected_income,
-            'income_per_hectare' => round($incomePerHectare, 2),
+            'income_per_acre' => round($incomePerAcre, 2),
             'confidence' => $combinedConfidence,
             'confidence_score' => round($combinedConfidenceScore),
             'variance_from_expected' => $varianceFromExpected ? round($varianceFromExpected, 2) : null,
@@ -136,16 +136,16 @@ class IncomeForecastService
             ->get();
 
         return $historicalSchedules->map(function ($histSchedule) {
-            $incomePerHectare = $histSchedule->hectares > 0
-                ? $histSchedule->income / $histSchedule->hectares
+            $incomePerAcre = $histSchedule->acres > 0
+                ? $histSchedule->income / $histSchedule->acres
                 : $histSchedule->income;
 
             return [
                 'harvest_date' => $histSchedule->actual_harvest_date->format('Y-m-d'),
                 'income' => $histSchedule->income,
-                'income_per_hectare' => round($incomePerHectare, 2),
+                'income_per_acre' => round($incomePerAcre, 2),
                 'yield' => $histSchedule->yield,
-                'hectares' => $histSchedule->hectares,
+                'acres' => $histSchedule->acres,
             ];
         })->toArray();
     }

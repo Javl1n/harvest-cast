@@ -25,7 +25,7 @@ it('trains model with historical schedules', function () {
         $schedule = Schedule::create([
             'commodity_id' => $commodity->id,
             'sensor_id' => $sensor->id,
-            'hectares' => 2.5,
+            'acres' => 6.2,
             'seed_weight_kg' => 2.5,
             'date_planted' => now()->subMonths(12 + $i),
             'expected_harvest_date' => now()->subMonths(9 + $i),
@@ -59,7 +59,7 @@ it('makes predictions after training', function () {
         $schedule = Schedule::create([
             'commodity_id' => $commodity->id,
             'sensor_id' => $sensor->id,
-            'hectares' => 2.5,
+            'acres' => 6.2,
             'seed_weight_kg' => 2.5,
             'date_planted' => now()->subMonths(12 + $i),
             'expected_harvest_date' => now()->subMonths(9 + $i),
@@ -78,7 +78,7 @@ it('makes predictions after training', function () {
     $testSchedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seeds_planted' => 50000,
         'date_planted' => now()->subDays(60),
         'expected_harvest_date' => now()->addDays(30),
@@ -92,7 +92,7 @@ it('makes predictions after training', function () {
 
     expect($prediction)->toBeGreaterThan(0)
         ->and($features)->toBeArray()
-        ->and($features)->toHaveCount(4); // 4 features: moisture, days, seeds/ha, hectares
+        ->and($features)->toHaveCount(4); // 4 features: moisture, days, seeds/ha, acres
 });
 
 it('calculates confidence based on R-squared and sample size', function () {
@@ -110,7 +110,7 @@ it('calculates confidence based on R-squared and sample size', function () {
         $schedule = Schedule::create([
             'commodity_id' => $commodity->id,
             'sensor_id' => $sensor->id,
-            'hectares' => 2.5,
+            'acres' => 6.2,
             'seed_weight_kg' => 2.5,
             'date_planted' => now()->subMonths(12 + $i),
             'expected_harvest_date' => now()->subMonths(9 + $i),
@@ -138,7 +138,7 @@ it('returns zero prediction when not trained', function () {
     $schedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seeds_planted' => 50000,
         'date_planted' => now()->subDays(60),
         'expected_harvest_date' => now()->addDays(30),
@@ -147,7 +147,7 @@ it('returns zero prediction when not trained', function () {
     ]);
 
     $model = new YieldPredictionModel;
-    $features = [55, 90, 20000, 2.5]; // mock features
+    $features = [55, 90, 20000, 6.2]; // mock features
 
     $prediction = $model->predict($features);
 
@@ -164,7 +164,7 @@ it('does not train with insufficient data', function () {
         $schedule = Schedule::create([
             'commodity_id' => $commodity->id,
             'sensor_id' => $sensor->id,
-            'hectares' => 2.5,
+            'acres' => 6.2,
             'seed_weight_kg' => 2.5,
             'date_planted' => now()->subMonths(12 + $i),
             'expected_harvest_date' => now()->subMonths(9 + $i),

@@ -17,7 +17,7 @@ it('returns null for harvested schedules', function () {
     $schedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 2.5,
         'date_planted' => now()->subDays(120),
         'expected_harvest_date' => now()->subDays(30),
@@ -45,7 +45,7 @@ it('returns basic forecast when insufficient historical data', function () {
     $schedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 2.5,
         'date_planted' => now()->subDays(60),
         'expected_harvest_date' => now()->addDays(30),
@@ -77,7 +77,7 @@ it('returns ML forecast with sufficient historical data', function () {
         Schedule::create([
             'commodity_id' => $commodity->id,
             'sensor_id' => $sensor->id,
-            'hectares' => 2.5,
+            'acres' => 6.2,
             'seed_weight_kg' => 2.5,
             'date_planted' => now()->subMonths(12 + $i),
             'expected_harvest_date' => now()->subMonths(9 + $i),
@@ -92,7 +92,7 @@ it('returns ML forecast with sufficient historical data', function () {
     $schedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 2.5,
         'date_planted' => now()->subDays(60),
         'expected_harvest_date' => now()->addDays(30),
@@ -114,7 +114,7 @@ it('returns ML forecast with sufficient historical data', function () {
             'expected_yield',
             'optimistic_yield',
             'pessimistic_yield',
-            'yield_per_hectare',
+            'yield_per_acre',
             'confidence',
             'confidence_score',
             'r_squared',
@@ -140,7 +140,7 @@ it('calculates growth progress correctly', function () {
     $schedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 2.5,
         'date_planted' => now()->subDays(50), // 50 days ago
         'expected_harvest_date' => now()->addDays(50), // 50 days from now (total 100 days)

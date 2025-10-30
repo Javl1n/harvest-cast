@@ -22,7 +22,7 @@ it('displays yield forecast on sensor detail page for active planting', function
         $historicalSchedule = Schedule::create([
             'commodity_id' => $commodity->id,
             'sensor_id' => $sensor->id,
-            'hectares' => 2.5,
+            'acres' => 6.2,
             'seed_weight_kg' => 2.5,
             'date_planted' => now()->subMonths(12 + $i),
             'expected_harvest_date' => now()->subMonths(9 + $i),
@@ -37,7 +37,7 @@ it('displays yield forecast on sensor detail page for active planting', function
     $activeSchedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seeds_planted' => 50000,
         'date_planted' => now()->subDays(60),
         'expected_harvest_date' => now()->addDays(30),
@@ -70,7 +70,7 @@ it('does not display yield forecast for harvested crops', function () {
     $harvestedSchedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seeds_planted' => 50000,
         'date_planted' => now()->subDays(120),
         'expected_harvest_date' => now()->subDays(30),
@@ -103,7 +103,7 @@ it('uses basic forecast when insufficient historical data', function () {
     $activeSchedule = Schedule::create([
         'commodity_id' => $commodity->id,
         'sensor_id' => $sensor->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seeds_planted' => 50000,
         'date_planted' => now()->subDays(60),
         'expected_harvest_date' => now()->addDays(30),

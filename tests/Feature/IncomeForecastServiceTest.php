@@ -102,7 +102,7 @@ test('it calculates income forecast successfully', function () {
     $schedule = Schedule::factory()->create([
         'sensor_id' => $this->sensor->id,
         'commodity_id' => $this->commodity->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'actual_harvest_date' => null,
         'expected_harvest_date' => Carbon::now()->addDays(60),
         'expected_income' => 300000,
@@ -148,7 +148,7 @@ test('it calculates income forecast successfully', function () {
             'optimistic_income',
             'pessimistic_income',
             'expected_income',
-            'income_per_hectare',
+            'income_per_acre',
             'confidence',
             'confidence_score',
             'variance_from_expected',
@@ -165,7 +165,7 @@ test('it calculates income forecast successfully', function () {
         ->and($forecast['optimistic_income'])->toBe(420000.0) // 6000 kg × 70 PHP
         ->and($forecast['pessimistic_income'])->toBe(200000.0) // 4000 kg × 50 PHP
         ->and($forecast['expected_income'])->toBe(300000.0)
-        ->and($forecast['income_per_hectare'])->toBe(120000.0) // 300000 / 2.5
+        ->and($forecast['income_per_acre'])->toBe(48387.1) // 300000 / 6.2
         ->and($forecast['days_until_harvest'])->toBe(60);
 });
 
@@ -269,7 +269,7 @@ test('it includes historical income data', function () {
         'actual_harvest_date' => Carbon::now()->subMonths(rand(1, 12)),
         'yield' => 5000,
         'income' => 250000,
-        'hectares' => 2,
+        'acres' => 4.9,
     ]);
 
     $schedule = Schedule::factory()->create([
@@ -315,8 +315,8 @@ test('it includes historical income data', function () {
         ->and($forecast['historical_income'][0])->toHaveKeys([
             'harvest_date',
             'income',
-            'income_per_hectare',
+            'income_per_acre',
             'yield',
-            'hectares',
+            'acres',
         ]);
 });

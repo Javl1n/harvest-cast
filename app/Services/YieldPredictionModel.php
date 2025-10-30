@@ -34,7 +34,7 @@ class YieldPredictionModel
             $extractedFeatures = $this->extractFeatures($schedule);
             if ($extractedFeatures !== null) {
                 $features[] = $extractedFeatures;
-                $targets[] = $schedule->yield / max($schedule->hectares, 0.01); // Yield per hectare
+                $targets[] = $schedule->yield / max($schedule->acres, 0.01); // Yield per acre
             }
         }
 
@@ -78,7 +78,7 @@ class YieldPredictionModel
     }
 
     /**
-     * Predict yield per hectare based on features.
+     * Predict yield per acre based on features.
      */
     public function predict(array $features): float
     {
@@ -143,21 +143,21 @@ class YieldPredictionModel
         // Calculate days from planting to harvest
         $daysToHarvest = $this->calculateDaysToHarvest($schedule);
 
-        // Calculate seed weight per hectare (planting density)
-        $kgPerHectare = $schedule->seed_weight_kg / max($schedule->hectares, 0.01);
+        // Calculate seed weight per acre (planting density)
+        $kgPerAcre = $schedule->seed_weight_kg / max($schedule->acres, 0.01);
 
         // Store feature names for reference
-        // Note: We don't include hectares as a feature because we're predicting yield PER hectare
+        // Note: We don't include acres as a feature because we're predicting yield PER acre
         $this->featureNames = [
             'avg_moisture',
             'days_to_harvest',
-            'kg_per_hectare',
+            'kg_per_acre',
         ];
 
         return [
             $avgMoisture,
             $daysToHarvest,
-            $kgPerHectare,
+            $kgPerAcre,
         ];
     }
 

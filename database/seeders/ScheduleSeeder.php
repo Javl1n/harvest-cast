@@ -53,27 +53,27 @@ class ScheduleSeeder extends Seeder
             'White Potato' => 100,
         ];
 
-        // Average yield per hectare (kg)
+        // Average yield per acre (kg) - converted from hectare by dividing by 2.47105
         $averageYields = [
-            'Rice' => 4000,
-            'Corn' => 5500,
-            'Ampalaya' => 8000,
-            'Eggplant' => 12000,
-            'Pechay' => 15000,
-            'Pechay Baguio' => 14000,
-            'Pole Sitao' => 10000,
-            'Squash' => 20000,
-            'Tomato' => 35000,
-            'Bell Pepper' => 15000,
-            'Broccoli' => 9000,
-            'Cauliflower' => 10000,
-            'Cabbage' => 30000,
-            'Carrots' => 25000,
-            'Celery' => 40000,
-            'Chayote' => 18000,
-            'Habichuelas/Baguio Beans' => 8000,
-            'Lettuce' => 20000,
-            'White Potato' => 20000,
+            'Rice' => 1619,           // 4000 / 2.47105
+            'Corn' => 2226,           // 5500 / 2.47105
+            'Ampalaya' => 3238,       // 8000 / 2.47105
+            'Eggplant' => 4857,       // 12000 / 2.47105
+            'Pechay' => 6070,         // 15000 / 2.47105
+            'Pechay Baguio' => 5665,  // 14000 / 2.47105
+            'Pole Sitao' => 4047,     // 10000 / 2.47105
+            'Squash' => 8094,         // 20000 / 2.47105
+            'Tomato' => 14166,        // 35000 / 2.47105
+            'Bell Pepper' => 6070,    // 15000 / 2.47105
+            'Broccoli' => 3642,       // 9000 / 2.47105
+            'Cauliflower' => 4047,    // 10000 / 2.47105
+            'Cabbage' => 12141,       // 30000 / 2.47105
+            'Carrots' => 10118,       // 25000 / 2.47105
+            'Celery' => 16189,        // 40000 / 2.47105
+            'Chayote' => 7285,        // 18000 / 2.47105
+            'Habichuelas/Baguio Beans' => 3238, // 8000 / 2.47105
+            'Lettuce' => 8094,        // 20000 / 2.47105
+            'White Potato' => 8094,   // 20000 / 2.47105
         ];
 
         // Average price per kg (PHP)
@@ -108,7 +108,7 @@ class ScheduleSeeder extends Seeder
             $commodityName = $commodity->name;
 
             $growingPeriod = $cropGrowingPeriods[$commodityName] ?? 90;
-            $expectedYieldPerHectare = $averageYields[$commodityName] ?? 10000;
+            $expectedYieldPerAcre = $averageYields[$commodityName] ?? 4047;
             $pricePerKg = $averagePrices[$commodityName] ?? 50;
 
             for ($i = 0; $i < $minSchedulesPerCropType; $i++) {
@@ -121,36 +121,36 @@ class ScheduleSeeder extends Seeder
                 $expectedHarvestDate = $datePlanted->copy()->addDays($growingPeriod);
 
                 // Randomize farm size (suitable for small sensors)
-                $hectares = round(rand(5, 30) / 10, 1); // 0.5 to 3.0 hectares
+                $acres = round(rand(12, 74) / 10, 1); // 1.24 to 7.41 acres (was 0.5-3.0 hectares)
 
                 // Calculate seed weight (kg) based on crop type
-                // Seeding rates in kg per hectare
-                $seedWeightPerHectare = match ($commodityName) {
-                    'Rice' => 40.0,
-                    'Corn' => 20.0,
-                    'Tomato' => 0.15,
-                    'Cabbage' => 0.4,
-                    'Cauliflower' => 0.5,
-                    'Broccoli' => 0.4,
-                    'Lettuce' => 0.8,
-                    'Pechay' => 1.5,
-                    'Pechay Baguio' => 1.2,
-                    'Carrots' => 3.0,
-                    'White Potato' => 1800.0,
-                    'Bell Pepper' => 0.3,
-                    'Eggplant' => 0.2,
-                    'Ampalaya' => 3.0,
-                    'Pole Sitao' => 50.0,
-                    'Squash' => 4.0,
-                    'Celery' => 0.5,
-                    'Chayote' => 2.0,
-                    'Habichuelas/Baguio Beans' => 60.0,
-                    default => 5.0,
+                // Seeding rates in kg per acre
+                $seedWeightPerAcre = match ($commodityName) {
+                    'Rice' => 16.19,
+                    'Corn' => 8.09,
+                    'Tomato' => 0.06,
+                    'Cabbage' => 0.16,
+                    'Cauliflower' => 0.20,
+                    'Broccoli' => 0.16,
+                    'Lettuce' => 0.32,
+                    'Pechay' => 0.61,
+                    'Pechay Baguio' => 0.49,
+                    'Carrots' => 1.21,
+                    'White Potato' => 728.52,
+                    'Bell Pepper' => 0.12,
+                    'Eggplant' => 0.08,
+                    'Ampalaya' => 1.21,
+                    'Pole Sitao' => 20.23,
+                    'Squash' => 1.62,
+                    'Celery' => 0.20,
+                    'Chayote' => 0.81,
+                    'Habichuelas/Baguio Beans' => 24.28,
+                    default => 2.02,
                 };
-                $seedWeightKg = round($seedWeightPerHectare * $hectares, 2);
+                $seedWeightKg = round($seedWeightPerAcre * $acres, 2);
 
                 // Calculate expected yield with some variation
-                $expectedYield = round($expectedYieldPerHectare * $hectares * rand(85, 115) / 100, 2);
+                $expectedYield = round($expectedYieldPerAcre * $acres * rand(85, 115) / 100, 2);
 
                 // Calculate expected income
                 $expectedIncome = round($expectedYield * $pricePerKg, 2);
@@ -163,7 +163,7 @@ class ScheduleSeeder extends Seeder
                 Schedule::create([
                     'commodity_id' => $commodity->id,
                     'sensor_id' => $sensor->id,
-                    'hectares' => $hectares,
+                    'acres' => $acres,
                     'seed_weight_kg' => $seedWeightKg,
                     'date_planted' => $datePlanted,
                     'expected_harvest_date' => $expectedHarvestDate,
@@ -189,7 +189,7 @@ class ScheduleSeeder extends Seeder
                 $commodityName = $commodity->name;
 
                 $growingPeriod = $cropGrowingPeriods[$commodityName] ?? 90;
-                $expectedYieldPerHectare = $averageYields[$commodityName] ?? 10000;
+                $expectedYieldPerAcre = $averageYields[$commodityName] ?? 4047;
                 $pricePerKg = $averagePrices[$commodityName] ?? 50;
 
                 // Determine if this is the current planting (last iteration and has current planting)
@@ -207,36 +207,36 @@ class ScheduleSeeder extends Seeder
                 $expectedHarvestDate = $datePlanted->copy()->addDays($growingPeriod);
 
                 // Randomize farm size (suitable for small sensors)
-                $hectares = round(rand(5, 30) / 10, 1); // 0.5 to 3.0 hectares
+                $acres = round(rand(12, 74) / 10, 1); // 1.24 to 7.41 acres (was 0.5-3.0 hectares)
 
                 // Calculate seed weight (kg) based on crop type
-                // Seeding rates in kg per hectare
-                $seedWeightPerHectare = match ($commodityName) {
-                    'Rice' => 40.0,
-                    'Corn' => 20.0,
-                    'Tomato' => 0.15,
-                    'Cabbage' => 0.4,
-                    'Cauliflower' => 0.5,
-                    'Broccoli' => 0.4,
-                    'Lettuce' => 0.8,
-                    'Pechay' => 1.5,
-                    'Pechay Baguio' => 1.2,
-                    'Carrots' => 3.0,
-                    'White Potato' => 1800.0,
-                    'Bell Pepper' => 0.3,
-                    'Eggplant' => 0.2,
-                    'Ampalaya' => 3.0,
-                    'Pole Sitao' => 50.0,
-                    'Squash' => 4.0,
-                    'Celery' => 0.5,
-                    'Chayote' => 2.0,
-                    'Habichuelas/Baguio Beans' => 60.0,
-                    default => 5.0,
+                // Seeding rates in kg per acre
+                $seedWeightPerAcre = match ($commodityName) {
+                    'Rice' => 16.19,
+                    'Corn' => 8.09,
+                    'Tomato' => 0.06,
+                    'Cabbage' => 0.16,
+                    'Cauliflower' => 0.20,
+                    'Broccoli' => 0.16,
+                    'Lettuce' => 0.32,
+                    'Pechay' => 0.61,
+                    'Pechay Baguio' => 0.49,
+                    'Carrots' => 1.21,
+                    'White Potato' => 728.52,
+                    'Bell Pepper' => 0.12,
+                    'Eggplant' => 0.08,
+                    'Ampalaya' => 1.21,
+                    'Pole Sitao' => 20.23,
+                    'Squash' => 1.62,
+                    'Celery' => 0.20,
+                    'Chayote' => 0.81,
+                    'Habichuelas/Baguio Beans' => 24.28,
+                    default => 2.02,
                 };
-                $seedWeightKg = round($seedWeightPerHectare * $hectares, 2);
+                $seedWeightKg = round($seedWeightPerAcre * $acres, 2);
 
                 // Calculate expected yield with some variation
-                $expectedYield = round($expectedYieldPerHectare * $hectares * rand(85, 115) / 100, 2);
+                $expectedYield = round($expectedYieldPerAcre * $acres * rand(85, 115) / 100, 2);
 
                 // Calculate expected income
                 $expectedIncome = round($expectedYield * $pricePerKg, 2);
@@ -260,7 +260,7 @@ class ScheduleSeeder extends Seeder
                 Schedule::create([
                     'commodity_id' => $commodity->id,
                     'sensor_id' => $sensor->id,
-                    'hectares' => $hectares,
+                    'acres' => $acres,
                     'seed_weight_kg' => $seedWeightKg,
                     'date_planted' => $datePlanted,
                     'expected_harvest_date' => $expectedHarvestDate,

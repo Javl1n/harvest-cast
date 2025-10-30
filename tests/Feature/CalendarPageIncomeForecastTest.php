@@ -47,7 +47,7 @@ test('calendar show page includes income forecast for active planting', function
     $activeSchedule = Schedule::factory()->create([
         'sensor_id' => $this->sensor->id,
         'commodity_id' => $this->commodity->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 100,
         'date_planted' => Carbon::now()->subDays(30),
         'expected_harvest_date' => Carbon::now()->addDays(60),
@@ -68,7 +68,7 @@ test('calendar show page includes income forecast for active planting', function
             'predicted_income',
             'optimistic_income',
             'pessimistic_income',
-            'income_per_hectare',
+            'income_per_acre',
             'confidence',
             'confidence_score',
             'yield_component',
@@ -105,7 +105,7 @@ test('income forecast includes both yield and price components', function () {
     $activeSchedule = Schedule::factory()->create([
         'sensor_id' => $this->sensor->id,
         'commodity_id' => $this->commodity->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 100,
         'date_planted' => Carbon::now()->subDays(30),
         'expected_harvest_date' => Carbon::now()->addDays(60),
@@ -146,7 +146,7 @@ test('income forecast includes calculation breakdown', function () {
     $activeSchedule = Schedule::factory()->create([
         'sensor_id' => $this->sensor->id,
         'commodity_id' => $this->commodity->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 100,
         'date_planted' => Carbon::now()->subDays(30),
         'expected_harvest_date' => Carbon::now()->addDays(60),
@@ -172,7 +172,7 @@ test('income forecast includes historical income data', function () {
     $activeSchedule = Schedule::factory()->create([
         'sensor_id' => $this->sensor->id,
         'commodity_id' => $this->commodity->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 100,
         'date_planted' => Carbon::now()->subDays(30),
         'expected_harvest_date' => Carbon::now()->addDays(60),
@@ -192,9 +192,9 @@ test('income forecast includes historical income data', function () {
     expect($firstHistorical)->toHaveKeys([
         'harvest_date',
         'income',
-        'income_per_hectare',
+        'income_per_acre',
         'yield',
-        'hectares',
+        'acres',
     ]);
 });
 
@@ -202,7 +202,7 @@ test('income forecast calculates variance from expected income', function () {
     $activeSchedule = Schedule::factory()->create([
         'sensor_id' => $this->sensor->id,
         'commodity_id' => $this->commodity->id,
-        'hectares' => 2.5,
+        'acres' => 6.2,
         'seed_weight_kg' => 100,
         'date_planted' => Carbon::now()->subDays(30),
         'expected_harvest_date' => Carbon::now()->addDays(60),

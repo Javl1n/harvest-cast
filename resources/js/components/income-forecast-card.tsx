@@ -148,7 +148,7 @@ const IncomeForecastCard = ({ forecast, cropName }: IncomeForecastCardProps) => 
                                 {formatCurrency(forecast.predicted_income)}
                             </div>
                             <div className="text-xs mt-1 text-muted-foreground">
-                                {formatCurrency(forecast.income_per_hectare)}/ha
+                                {formatCurrency(forecast.income_per_acre)}/acre
                             </div>
                         </div>
 
@@ -318,11 +318,11 @@ const IncomeForecastCard = ({ forecast, cropName }: IncomeForecastCardProps) => 
                                     >
                                         <div>
                                             <div className="font-medium">{new Date(record.harvest_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
-                                            <div className="text-muted-foreground">{record.yield.toFixed(0)} kg from {record.hectares} ha</div>
+                                            <div className="text-muted-foreground">{record.yield.toFixed(0)} kg from {record.acres} acres</div>
                                         </div>
                                         <div className="text-right">
                                             <div className="font-semibold">{formatCurrency(record.income)}</div>
-                                            <div className="text-muted-foreground">{formatCurrency(record.income_per_hectare)}/ha</div>
+                                            <div className="text-muted-foreground">{formatCurrency(record.income_per_acre)}/acre</div>
                                         </div>
                                     </div>
                                 ))}

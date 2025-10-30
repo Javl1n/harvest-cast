@@ -25,7 +25,7 @@ describe('Role-Based Authorization', function () {
             $response = $this->actingAs($admin)->post('/crops', [
                 'commodity_id' => 1,
                 'sensor_id' => $sensor->id,
-                'hectares' => 10.5,
+                'acres' => 25.9,
                 'seed_weight_kg' => 5.0,
                 'date_planted' => now()->toDateString(),
                 'expected_harvest_date' => now()->addMonths(3)->toDateString(),
@@ -34,7 +34,7 @@ describe('Role-Based Authorization', function () {
             $response->assertRedirect();
             $this->assertDatabaseHas('schedules', [
                 'sensor_id' => $sensor->id,
-                'hectares' => 10.5,
+                'acres' => 25.9,
             ]);
         });
 
@@ -78,7 +78,7 @@ describe('Role-Based Authorization', function () {
             $response = $this->actingAs($farmer)->post('/crops', [
                 'commodity_id' => 1,
                 'sensor_id' => $sensor->id,
-                'hectares' => 10.5,
+                'acres' => 25.9,
                 'seed_weight_kg' => 5.0,
                 'date_planted' => now()->toDateString(),
                 'expected_harvest_date' => now()->addMonths(3)->toDateString(),

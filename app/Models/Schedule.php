@@ -9,7 +9,7 @@ class Schedule extends Model
     protected $fillable = [
         'commodity_id',
         'sensor_id',
-        'hectares',
+        'acres',
         'seed_weight_kg',
         'date_planted',
         'expected_harvest_date',

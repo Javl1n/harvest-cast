@@ -18,44 +18,44 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Typical seeding rates per hectare for common crops (in kg)
+// Typical seeding rates per acre for common crops (in kg)
 const SEEDING_RATES: { [key: string]: number } = {
-    'rice': 40.0, // 40 kg per hectare
-    'corn': 20.0,  // 20 kg per hectare
-    'wheat': 125.0, // 125 kg per hectare
-    'barley': 125.0, // 125 kg per hectare
-    'soybean': 75.0, // 75 kg per hectare
-    'cotton': 15.0, // 15 kg per hectare
-    'sunflower': 8.0, // 8 kg per hectare
-    'tomato': 0.15, // 0.15 kg per hectare
-    'lettuce': 0.8, // 0.8 kg per hectare
-    'carrot': 3.0, // 3 kg per hectare
-    'cabbage': 0.4, // 0.4 kg per hectare
-    'onion': 4.0, // 4 kg per hectare
-    'potato': 1800.0, // 1800 kg (seed tubers) per hectare
-    'white potato': 1800.0, // 1800 kg per hectare
-    'bean': 80.0, // 80 kg per hectare
-    'pea': 120.0, // 120 kg per hectare
-    'pechay': 1.5, // 1.5 kg per hectare
-    'pechay baguio': 1.2, // 1.2 kg per hectare
-    'bell pepper': 0.3, // 0.3 kg per hectare
-    'eggplant': 0.2, // 0.2 kg per hectare
-    'ampalaya': 3.0, // 3 kg per hectare
-    'pole sitao': 50.0, // 50 kg per hectare
-    'squash': 4.0, // 4 kg per hectare
-    'broccoli': 0.4, // 0.4 kg per hectare
-    'cauliflower': 0.5, // 0.5 kg per hectare
-    'celery': 0.5, // 0.5 kg per hectare
-    'chayote': 2.0, // 2 kg per hectare
-    'habichuelas/baguio beans': 60.0, // 60 kg per hectare
+    'rice': 16.19, // 16.19 kg per acre
+    'corn': 8.09,  // 8.09 kg per acre
+    'wheat': 50.58, // 50.58 kg per acre
+    'barley': 50.58, // 50.58 kg per acre
+    'soybean': 30.35, // 30.35 kg per acre
+    'cotton': 6.07, // 6.07 kg per acre
+    'sunflower': 3.24, // 3.24 kg per acre
+    'tomato': 0.06, // 0.06 kg per acre
+    'lettuce': 0.32, // 0.32 kg per acre
+    'carrot': 1.21, // 1.21 kg per acre
+    'cabbage': 0.16, // 0.16 kg per acre
+    'onion': 1.62, // 1.62 kg per acre
+    'potato': 728.52, // 728.52 kg (seed tubers) per acre
+    'white potato': 728.52, // 728.52 kg per acre
+    'bean': 32.37, // 32.37 kg per acre
+    'pea': 48.56, // 48.56 kg per acre
+    'pechay': 0.61, // 0.61 kg per acre
+    'pechay baguio': 0.49, // 0.49 kg per acre
+    'bell pepper': 0.12, // 0.12 kg per acre
+    'eggplant': 0.08, // 0.08 kg per acre
+    'ampalaya': 1.21, // 1.21 kg per acre
+    'pole sitao': 20.23, // 20.23 kg per acre
+    'squash': 1.62, // 1.62 kg per acre
+    'broccoli': 0.16, // 0.16 kg per acre
+    'cauliflower': 0.20, // 0.20 kg per acre
+    'celery': 0.20, // 0.20 kg per acre
+    'chayote': 0.81, // 0.81 kg per acre
+    'habichuelas/baguio beans': 24.28, // 24.28 kg per acre
 };
 
 // Function to calculate seed weight (kg) based on area and crop type
-const calculateSeedWeight = (hectares: string, cropName: string): string => {
-    const area = parseFloat(hectares);
+const calculateSeedWeight = (acres: string, cropName: string): string => {
+    const area = parseFloat(acres);
     if (!area || area <= 0 || !cropName) return '';
 
-    const seedingRate = SEEDING_RATES[cropName.toLowerCase()] || 5.0; // Default rate
+    const seedingRate = SEEDING_RATES[cropName.toLowerCase()] || 2.02; // Default rate
     const totalWeight = area * seedingRate;
 
     return totalWeight.toFixed(2);
@@ -75,7 +75,7 @@ const CropCreate = () => {
     const { data, setData, post, processing, errors } = useForm({
         commodity_id: '',
         sensor_id: sensor.id,
-        hectares: '',
+        acres: '',
         seed_weight_kg: '',
         date_planted: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
         expected_harvest_date: '',
@@ -102,16 +102,16 @@ const CropCreate = () => {
 
     // Automatically calculate seed weight when area or crop type changes
     useEffect(() => {
-        if (data.hectares && data.commodity_id) {
+        if (data.acres && data.commodity_id) {
             const selectedCommodity = commodities.find(c => c.id.toString() === data.commodity_id);
             if (selectedCommodity) {
-                const calculatedWeight = calculateSeedWeight(data.hectares, selectedCommodity.name);
+                const calculatedWeight = calculateSeedWeight(data.acres, selectedCommodity.name);
                 if (calculatedWeight && calculatedWeight !== data.seed_weight_kg) {
                     setData('seed_weight_kg', calculatedWeight);
                 }
             }
         }
-    }, [data.hectares, data.commodity_id, commodities, data.seed_weight_kg, setData]);
+    }, [data.acres, data.commodity_id, commodities, data.seed_weight_kg, setData]);
 
     // Function to recalculate harvest date when plant date changes
     const handleDatePlantedChange = (newDatePlanted: string) => {
@@ -197,24 +197,24 @@ const CropCreate = () => {
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <Label htmlFor="hectares" className="text-sm">Area (Hectares) *</Label>
+                                <Label htmlFor="acres" className="text-sm">Area (Acres) *</Label>
                                 <Input
-                                    id="hectares"
+                                    id="acres"
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    placeholder="e.g., 2.5"
-                                    value={data.hectares}
-                                    onChange={(e) => setData('hectares', e.target.value)}
-                                    className={`text-sm ${errors.hectares ? 'border-destructive' : ''}`}
+                                    placeholder="e.g., 6.2"
+                                    value={data.acres}
+                                    onChange={(e) => setData('acres', e.target.value)}
+                                    className={`text-sm ${errors.acres ? 'border-destructive' : ''}`}
                                 />
-                                <InputError message={errors.hectares} />
+                                <InputError message={errors.acres} />
                             </div>
 
                             <div className="space-y-1">
                                 <Label htmlFor="seed_weight_kg" className="text-sm">
                                     Seed Weight (kg) *
-                                    {data.hectares && data.commodity_id && (
+                                    {data.acres && data.commodity_id && (
                                         <span className="text-xs text-muted-foreground ml-1">(Auto-calculated)</span>
                                     )}
                                 </Label>
@@ -227,10 +227,10 @@ const CropCreate = () => {
                                     value={data.seed_weight_kg}
                                     onChange={(e) => setData('seed_weight_kg', e.target.value)}
                                     className={`text-sm ${errors.seed_weight_kg ? 'border-destructive' : ''} ${
-                                        data.hectares && data.commodity_id ? 'bg-muted/50' : ''
+                                        data.acres && data.commodity_id ? 'bg-muted/50' : ''
                                     }`}
                                 />
-                                {data.hectares && data.commodity_id && (
+                                {data.acres && data.commodity_id && (
                                     <p className="text-xs text-muted-foreground">
                                         Based on typical seeding rate for {commodities.find(c => c.id.toString() === data.commodity_id)?.name.toLowerCase()}
                                     </p>

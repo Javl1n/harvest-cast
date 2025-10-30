@@ -31,7 +31,7 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
     const expectedYieldTons = forecast.expected_yield ? forecast.expected_yield / 1000 : null;
     const optimisticYieldTons = forecast.optimistic_yield / 1000;
     const pessimisticYieldTons = forecast.pessimistic_yield / 1000;
-    const yieldPerHectareTons = forecast.yield_per_hectare / 1000;
+    const yieldPerAcreTons = forecast.yield_per_acre / 1000;
 
     // Calculate the variance trend
     const varianceTrend = forecast.variance_from_expected_percent;
@@ -70,7 +70,7 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
     const historicalChartData = forecast.historical_yields.map(point => ({
         date: new Date(point.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
         yield: point.yield / 1000,
-        yieldPerHectare: point.yield_per_hectare / 1000,
+        yieldPerAcre: point.yield_per_acre / 1000,
     }));
 
     // Add current prediction to chart
@@ -79,7 +79,7 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
         {
             date: 'Predicted',
             yield: predictedYieldTons,
-            yieldPerHectare: yieldPerHectareTons,
+            yieldPerAcre: yieldPerAcreTons,
             isPrediction: true,
         },
     ];
@@ -176,7 +176,7 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                             </div>
                             <div className="text-xs text-muted-foreground">tons</div>
                             <div className="text-xs mt-1 text-muted-foreground">
-                                {yieldPerHectareTons.toFixed(2)} tons/ha
+                                {yieldPerAcreTons.toFixed(2)} tons/acre
                             </div>
                         </div>
 
@@ -305,7 +305,7 @@ const YieldForecastCard = ({ forecast, cropName }: YieldForecastCardProps) => {
                                                                 Total: {Number(payload[0].value).toFixed(2)} tons
                                                             </div>
                                                             <div className="text-xs text-muted-foreground">
-                                                                Per hectare: {Number(payload[0].payload.yieldPerHectare).toFixed(2)} tons/ha
+                                                                Per acre: {Number(payload[0].payload.yieldPerAcre).toFixed(2)} tons/acre
                                                             </div>
                                                             {payload[0].payload.isPrediction && (
                                                                 <Badge className="text-xs mt-1 bg-purple-100 text-purple-800">
