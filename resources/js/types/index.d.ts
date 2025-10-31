@@ -135,6 +135,24 @@ export interface CropCareRecommendation {
     category: string;
 }
 
+export interface CropImage {
+    id: number;
+    schedule_id: number;
+    image_url: string;
+    file_name: string;
+    ai_analysis: {
+        health_status: 'healthy' | 'warning' | 'diseased' | 'error';
+        diseases: string[];
+        confidence: number;
+        recommendations: string[];
+    } | null;
+    health_status: string | null;
+    recommendations: string | null;
+    processed: boolean;
+    image_date: string;
+    created_at: string;
+}
+
 export interface YieldForecast {
     predicted_yield: number;
     expected_yield?: number;

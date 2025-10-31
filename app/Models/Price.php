@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Price extends Model
 {
-    protected $fillable = ['price', 'date'];
+    protected $fillable = ['variant_id', 'price', 'date'];
 
     public function variant()
     {

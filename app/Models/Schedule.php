@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'commodity_id',
         'sensor_id',
@@ -38,5 +41,15 @@ class Schedule extends Model
     public function commodity()
     {
         return $this->belongsTo(Commodity::class, 'commodity_id');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(CropImage::class);
+    }
+
+    public function latestImage()
+    {
+        return $this->hasOne(CropImage::class)->latestOfMany('image_date');
     }
 }

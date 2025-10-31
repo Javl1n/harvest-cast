@@ -76,27 +76,29 @@ class ScheduleSeeder extends Seeder
             'White Potato' => 8094,   // 20000 / 2.47105
         ];
 
-        // Average price per kg (PHP)
+        // Average price per kg (PHP) - adjusted based on realistic income per acre research
+        // Income per acre = yield per acre × price per kg
+        // Field crops: ~₱50,000-85,000/acre | High-value vegetables: ~₱500,000-2,000,000/acre
         $averagePrices = [
-            'Rice' => 45,
-            'Corn' => 25,
-            'Ampalaya' => 60,
-            'Eggplant' => 50,
-            'Pechay' => 40,
-            'Pechay Baguio' => 45,
-            'Pole Sitao' => 55,
-            'Squash' => 30,
-            'Tomato' => 70,
-            'Bell Pepper' => 150,
-            'Broccoli' => 100,
-            'Cauliflower' => 90,
-            'Cabbage' => 35,
-            'Carrots' => 80,
-            'Celery' => 120,
-            'Chayote' => 40,
-            'Habichuelas/Baguio Beans' => 90,
-            'Lettuce' => 60,
-            'White Potato' => 50,
+            'Rice' => 35,              // ~₱56,665/acre (1,619 kg × ₱35)
+            'Corn' => 20,              // ~₱44,520/acre (2,226 kg × ₱20)
+            'Ampalaya' => 65,          // ~₱210,470/acre (3,238 kg × ₱65)
+            'Eggplant' => 40,          // ~₱194,280/acre (4,857 kg × ₱40)
+            'Pechay' => 45,            // ~₱273,150/acre (6,070 kg × ₱45)
+            'Pechay Baguio' => 50,     // ~₱283,250/acre (5,665 kg × ₱50)
+            'Pole Sitao' => 60,        // ~₱242,820/acre (4,047 kg × ₱60)
+            'Squash' => 35,            // ~₱283,290/acre (8,094 kg × ₱35)
+            'Tomato' => 50,            // ~₱708,300/acre (14,166 kg × ₱50)
+            'Bell Pepper' => 180,      // ~₱1,092,600/acre (6,070 kg × ₱180)
+            'Broccoli' => 130,         // ~₱473,460/acre (3,642 kg × ₱130)
+            'Cauliflower' => 110,      // ~₱445,170/acre (4,047 kg × ₱110)
+            'Cabbage' => 30,           // ~₱364,230/acre (12,141 kg × ₱30)
+            'Carrots' => 60,           // ~₱607,080/acre (10,118 kg × ₱60)
+            'Celery' => 140,           // ~₱2,266,460/acre (16,189 kg × ₱140)
+            'Chayote' => 45,           // ~₱327,825/acre (7,285 kg × ₱45)
+            'Habichuelas/Baguio Beans' => 95, // ~₱307,610/acre (3,238 kg × ₱95)
+            'Lettuce' => 130,          // ~₱1,052,220/acre (8,094 kg × ₱130, supports 2-3 harvests/year)
+            'White Potato' => 55,      // ~₱445,170/acre (8,094 kg × ₱55)
         ];
 
         $schedulesCreated = 0;
@@ -121,7 +123,7 @@ class ScheduleSeeder extends Seeder
                 $expectedHarvestDate = $datePlanted->copy()->addDays($growingPeriod);
 
                 // Randomize farm size (suitable for small sensors)
-                $acres = round(rand(12, 74) / 10, 1); // 1.24 to 7.41 acres (was 0.5-3.0 hectares)
+                $acres = round(rand(5, 30) / 10, 1); // 0.5 to 3.0 acres
 
                 // Calculate seed weight (kg) based on crop type
                 // Seeding rates in kg per acre
@@ -207,7 +209,7 @@ class ScheduleSeeder extends Seeder
                 $expectedHarvestDate = $datePlanted->copy()->addDays($growingPeriod);
 
                 // Randomize farm size (suitable for small sensors)
-                $acres = round(rand(12, 74) / 10, 1); // 1.24 to 7.41 acres (was 0.5-3.0 hectares)
+                $acres = round(rand(5, 30) / 10, 1); // 0.5 to 3.0 acres
 
                 // Calculate seed weight (kg) based on crop type
                 // Seeding rates in kg per acre

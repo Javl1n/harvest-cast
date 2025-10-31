@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\CalendarPageController;
+use App\Http\Controllers\CropImageController;
 use App\Http\Controllers\PricingForecastController;
-use App\Http\Controllers\SensorController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -33,6 +33,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->group(function () {
             Route::get('/', 'index')->name('index');
         });
+
+    Route::prefix('/crop-images')->name('crop-images.')->controller(CropImageController::class)
+        ->middleware('admin')
+        ->group(function () {
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{image}', 'destroy')->name('destroy');
+        });
+
+    Route::get('/crop-images/{image}', [CropImageController::class, 'show'])->name('crop-images.show');
 });
 
 require __DIR__.'/settings.php';

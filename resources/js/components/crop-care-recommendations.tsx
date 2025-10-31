@@ -1,23 +1,27 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-    Droplets, 
-    Thermometer, 
-    CloudIcon, 
-    RefreshCw, 
-    AlertTriangle, 
-    CheckCircle, 
-    Sun, 
-    CloudRain, 
-    Wind, 
-    Snowflake, 
-    Sprout, 
-    TreePine, 
-    Flower, 
-    Apple, 
-    Wheat, 
-    Leaf, 
+import CropImageAnalysisDisplay from "@/components/crop-image-analysis-display";
+import CropImageUpload from "@/components/crop-image-upload";
+import { CropImage } from "@/types";
+import { usePage } from "@inertiajs/react";
+import {
+    Droplets,
+    Thermometer,
+    CloudIcon,
+    RefreshCw,
+    AlertTriangle,
+    CheckCircle,
+    Sun,
+    CloudRain,
+    Wind,
+    Snowflake,
+    Sprout,
+    TreePine,
+    Flower,
+    Apple,
+    Wheat,
+    Leaf,
     Bug,
     Heart,
     Clock
@@ -46,6 +50,8 @@ interface CropCareRecommendationsProps {
     currentConditions: CurrentConditions | null;
     cropName?: string;
     daysSincePlanting?: number;
+    latestCropImage?: CropImage | null;
+    scheduleId?: number | null;
 }
 
 const getIconComponent = (iconName: string) => {
@@ -102,13 +108,17 @@ const getCategoryColor = (category: string) => {
     }
 };
 
-const CropCareRecommendations = ({ 
-    recommendations, 
-    currentConditions, 
+const CropCareRecommendations = ({
+    recommendations,
+    currentConditions,
     cropName,
-    daysSincePlanting 
+    daysSincePlanting,
+    latestCropImage,
+    scheduleId
 }: CropCareRecommendationsProps) => {
     const [loading, setLoading] = useState(false);
+    const { auth } = usePage<{ auth: { user: { role: 'admin' | 'farmer' } } }>().props;
+    const isAdmin = auth?.user?.role === 'admin';
 
     const refreshRecommendations = async () => {
         setLoading(true);
@@ -116,6 +126,15 @@ const CropCareRecommendations = ({
         setTimeout(() => {
             window.location.reload();
         }, 500);
+    };
+
+    const isImageFromToday = (image: CropImage | null) => {
+        if (!image) {
+            return false;
+        }
+        const today = new Date().toDateString();
+        const imageDate = new Date(image.image_date).toDateString();
+        return today === imageDate;
     };
 
     if (!currentConditions || recommendations.length === 0) {
@@ -149,9 +168,9 @@ const CropCareRecommendations = ({
                         </Badge>
                     )}
                 </div>
-                <Button 
-                    variant="ghost" 
-                    size="sm" 
+                <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={refreshRecommendations}
                     disabled={loading}
                     className="h-6 w-6 p-0"
@@ -159,7 +178,24 @@ const CropCareRecommendations = ({
                     <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
                 </Button>
             </div>
-            
+
+            {/* Crop Health Image Section */}
+            {scheduleId && (
+                <div className="border-b border-border/30 pb-3">
+                    {isImageFromToday(latestCropImage || null) ? (
+                        <CropImageAnalysisDisplay
+                            image={latestCropImage!}
+                            isAdmin={isAdmin}
+                        />
+                    ) : (
+                        <CropImageUpload
+                            scheduleId={scheduleId}
+                            isAdmin={isAdmin}
+                        />
+                    )}
+                </div>
+            )}
+
             {/* Current Conditions Summary */}
             <div className="grid grid-cols-4 gap-2 p-2 bg-muted/10 rounded border border-border/50">
                 <div className="flex flex-col items-center text-center">

@@ -144,6 +144,14 @@ class CalendarPageController extends Controller
             $incomeForecast = $incomeForecastService->getForecast($latestSchedule);
         }
 
+        $latestCropImage = null;
+        $scheduleId = null;
+
+        if ($latestSchedule && ! $latestSchedule->actual_harvest_date) {
+            $latestCropImage = $latestSchedule->latestImage;
+            $scheduleId = $latestSchedule->id;
+        }
+
         return inertia()->render('sensors/show', [
             'sensor' => $sensor->load('readings', 'latestReading', 'schedules.commodity', 'latestSchedule.commodity'),
             'careRecommendations' => $careRecommendations,
@@ -151,6 +159,19 @@ class CalendarPageController extends Controller
             'hasCareRecommendations' => ! empty($careRecommendations),
             'yieldForecast' => $yieldForecast,
             'incomeForecast' => $incomeForecast,
+            'latestCropImage' => $latestCropImage ? [
+                'id' => $latestCropImage->id,
+                'schedule_id' => $latestCropImage->schedule_id,
+                'image_url' => $latestCropImage->image_url,
+                'file_name' => $latestCropImage->file_name,
+                'ai_analysis' => $latestCropImage->ai_analysis,
+                'health_status' => $latestCropImage->health_status,
+                'recommendations' => $latestCropImage->recommendations,
+                'processed' => $latestCropImage->processed,
+                'image_date' => $latestCropImage->image_date->toDateString(),
+                'created_at' => $latestCropImage->created_at->toIso8601String(),
+            ] : null,
+            'scheduleId' => $scheduleId,
         ]);
     }
 

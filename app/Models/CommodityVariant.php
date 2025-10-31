@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CommodityVariant extends Model
 {
-    protected $fillable = ["name"];
+    protected $fillable = ['name'];
 
     public function commodity()
     {
@@ -15,6 +15,6 @@ class CommodityVariant extends Model
 
     public function prices()
     {
-        return $this->hasMany(Price::class, "variant_id");
+        return $this->hasMany(Price::class, 'variant_id');
     }
 }

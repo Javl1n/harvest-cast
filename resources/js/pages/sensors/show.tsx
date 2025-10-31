@@ -2,7 +2,7 @@ import { useSetPanelSize } from "@/hooks/use-set-panel-size";
 import { useFlyToLocation } from "@/hooks/useFlyToLocation";
 import AppLayout from "@/layouts/app-layout";
 import calendar from "@/routes/calendar";
-import { BreadcrumbItem, SensorInterface, CropCareRecommendation, CurrentConditions, YieldForecast, IncomeForecast } from "@/types";
+import { BreadcrumbItem, SensorInterface, CropCareRecommendation, CurrentConditions, YieldForecast, IncomeForecast, CropImage } from "@/types";
 import { Head, usePage } from "@inertiajs/react";
 import CropCareRecommendations from "@/components/crop-care-recommendations";
 import YieldForecastCard from "@/components/yield-forecast-card";
@@ -24,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const SensorsShow = () => {
-     const {sensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, incomeForecast, auth} = usePage<{
+     const {sensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, incomeForecast, auth, latestCropImage, scheduleId} = usePage<{
          sensor: SensorInterface;
          careRecommendations: CropCareRecommendation[];
          currentConditions: CurrentConditions | null;
@@ -32,6 +32,8 @@ const SensorsShow = () => {
          yieldForecast: YieldForecast | null;
          incomeForecast: IncomeForecast | null;
          auth: { user: { id: number; name: string; email: string; role: 'admin' | 'farmer' } | null };
+         latestCropImage?: CropImage | null;
+         scheduleId?: number | null;
      }>().props;
      useSetPanelSize(30);
      const filterToSensor = useSetAtom(filterToSensorAtom);
@@ -111,6 +113,8 @@ const SensorsShow = () => {
                                    ? Math.floor((new Date().getTime() - new Date(latestSchedule.date_planted).getTime()) / (1000 * 60 * 60 * 24))
                                    : undefined
                               }
+                              latestCropImage={latestCropImage}
+                              scheduleId={scheduleId}
                          />
                     )}
 

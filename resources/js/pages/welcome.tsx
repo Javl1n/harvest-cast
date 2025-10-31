@@ -5,17 +5,12 @@ import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
-import { ArrowRight, Cloud, Droplets, Leaf, LineChart, MapPin, Sprout, TrendingUp } from 'lucide-react';
+import { ArrowRight, DollarSign, Droplets, Leaf, LineChart, MapPin, Sprout, TrendingUp } from 'lucide-react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
 
     const features = [
-        {
-            icon: Cloud,
-            title: 'Weather Monitoring',
-            description: 'Real-time weather data and forecasts to help you make informed decisions about your crops.',
-        },
         {
             icon: Droplets,
             title: 'Soil Sensors',
@@ -30,6 +25,11 @@ export default function Welcome() {
             icon: TrendingUp,
             title: 'Price Forecasting',
             description: 'Stay ahead of market trends with commodity price predictions.',
+        },
+        {
+            icon: DollarSign,
+            title: 'Income Forecast',
+            description: 'Project your farm revenue with comprehensive income forecasting based on yields and market prices.',
         },
         {
             icon: Leaf,
