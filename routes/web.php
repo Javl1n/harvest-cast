@@ -32,13 +32,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('/pricing-forecast')->name('pricing-forecast.')->controller(PricingForecastController::class)
         ->group(function () {
             Route::get('/', 'index')->name('index');
+            Route::get('/{commodity}', 'show')->name('show');
         });
 
     Route::prefix('/crop-images')->name('crop-images.')->controller(CropImageController::class)
-        ->middleware('admin')
         ->group(function () {
             Route::post('/', 'store')->name('store');
-            Route::delete('/{image}', 'destroy')->name('destroy');
+            Route::delete('/{image}', 'destroy')->middleware('admin')->name('destroy');
         });
 
     Route::get('/crop-images/{image}', [CropImageController::class, 'show'])->name('crop-images.show');

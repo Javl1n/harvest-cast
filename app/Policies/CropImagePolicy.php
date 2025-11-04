@@ -28,7 +28,7 @@ class CropImagePolicy
      */
     public function create(User $user): bool
     {
-        return $user->role === 'admin';
+        return true;
     }
 
     /**

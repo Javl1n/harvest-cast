@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Commodity;
 use App\Models\Price;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class PricingForecastController extends Controller
@@ -12,18 +13,37 @@ class PricingForecastController extends Controller
     public function index()
     {
         return Inertia::render('pricing-forecast/index', [
-            'forecastData' => Inertia::defer(fn () => $this->getForecastData()),
+            'forecastData' => Inertia::defer(fn () => Cache::remember(
+                'pricing-forecast-index',
+                now()->addMinutes(10),
+                fn () => $this->getForecastData(10)
+            )),
         ]);
     }
 
-    private function getForecastData(): array
+    public function show(Commodity $commodity)
     {
-        // Get commodities with their variants and latest prices
+        $period = request()->query('period', '90days');
+
+        return Inertia::render('pricing-forecast/show', [
+            'forecastData' => Inertia::defer(fn () => Cache::remember(
+                "pricing-forecast-show-{$commodity->id}-{$period}",
+                now()->addMinutes(10),
+                fn () => $this->getCommodityForecastData($commodity, $period)
+            )),
+            'selectedPeriod' => $period,
+        ]);
+    }
+
+    private function getForecastData(?int $limit = null): array
+    {
+        // Get commodities with their variants and latest prices (optimized eager loading)
         $commodities = Commodity::with([
-            'variants' => function ($query) {
-                $query->with(['prices' => function ($priceQuery) {
-                    $priceQuery->orderBy('date', 'desc');
-                }]);
+            'variants.prices' => function ($query) use ($limit) {
+                $query->orderBy('date', 'desc');
+                if ($limit) {
+                    $query->limit($limit);
+                }
             },
         ])->get();
 
@@ -37,7 +57,8 @@ class PricingForecastController extends Controller
             ];
 
             foreach ($commodity->variants as $variant) {
-                $prices = $variant->prices()->orderBy('date', 'desc')->get();
+                // Use already loaded prices from eager loading
+                $prices = $variant->prices;
 
                 if ($prices->count() >= 3) {
                     $forecast = $this->calculateForecast($prices);
@@ -57,10 +78,64 @@ class PricingForecastController extends Controller
                 }
             }
 
-            $forecastData[] = $commodityData;
+            if (! empty($commodityData['variants'])) {
+                $forecastData[] = $commodityData;
+            }
         }
 
         return $forecastData;
+    }
+
+    private function getCommodityForecastData(Commodity $commodity, string $period = '90days'): array
+    {
+        // Determine date range based on period
+        $dateFilter = match ($period) {
+            '30days' => now()->subDays(30),
+            '90days' => now()->subDays(90),
+            '6months' => now()->subMonths(6),
+            'year' => now()->startOfYear(),
+            'all' => null,
+            default => now()->subDays(90),
+        };
+
+        // Get commodity with its variants and prices based on selected period
+        $commodity->load([
+            'variants.prices' => function ($query) use ($dateFilter) {
+                $query->orderBy('date', 'desc');
+                if ($dateFilter) {
+                    $query->where('date', '>=', $dateFilter);
+                }
+            },
+        ]);
+
+        $commodityData = [
+            'commodity' => $commodity,
+            'variants' => [],
+        ];
+
+        foreach ($commodity->variants as $variant) {
+            // Use already loaded prices from eager loading
+            $prices = $variant->prices;
+
+            if ($prices->count() >= 3) {
+                $forecast = $this->calculateForecast($prices);
+                $commodityData['variants'][] = [
+                    'variant' => $variant,
+                    'current_price' => $prices->first(),
+                    'price_history' => $prices,
+                    'forecast' => $forecast,
+                ];
+            } else {
+                $commodityData['variants'][] = [
+                    'variant' => $variant,
+                    'current_price' => $prices->first(),
+                    'price_history' => $prices,
+                    'forecast' => null,
+                ];
+            }
+        }
+
+        return $commodityData;
     }
 
     private function calculateForecast($prices)

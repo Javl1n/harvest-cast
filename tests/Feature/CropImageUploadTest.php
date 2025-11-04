@@ -4,11 +4,12 @@ use App\Jobs\AnalyzeCropImage;
 use App\Models\CropImage;
 use App\Models\Schedule;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 
-use function Pest\Laravel\actingAs;
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('public');
@@ -19,11 +20,12 @@ it('allows admin to upload crop image', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $schedule = Schedule::factory()->create();
 
-    actingAs($admin)
+    $this->actingAs($admin)
+        ->withSession(['_token' => 'test-token'])
         ->postJson('/crop-images', [
             'image' => UploadedFile::fake()->image('crop.jpg', 1024, 768),
             'schedule_id' => $schedule->id,
-        ])
+        ], ['X-CSRF-TOKEN' => 'test-token'])
         ->assertCreated()
         ->assertJson([
             'message' => 'Image uploaded successfully. Analysis in progress.',
@@ -39,16 +41,28 @@ it('allows admin to upload crop image', function () {
     Queue::assertPushed(AnalyzeCropImage::class);
 });
 
-it('prevents farmer from uploading images', function () {
+it('allows farmer to upload crop image', function () {
     $farmer = User::factory()->create(['role' => 'farmer']);
     $schedule = Schedule::factory()->create();
 
-    actingAs($farmer)
+    $this->actingAs($farmer)
+        ->withSession(['_token' => 'test-token'])
         ->postJson('/crop-images', [
             'image' => UploadedFile::fake()->image('crop.jpg'),
             'schedule_id' => $schedule->id,
-        ])
-        ->assertForbidden();
+        ], ['X-CSRF-TOKEN' => 'test-token'])
+        ->assertCreated()
+        ->assertJson([
+            'message' => 'Image uploaded successfully. Analysis in progress.',
+        ]);
+
+    $this->assertDatabaseCount('crop_images', 1);
+
+    $image = CropImage::first();
+    expect($image->schedule_id)->toBe($schedule->id);
+    expect($image->processed)->toBeFalse();
+
+    Queue::assertPushed(AnalyzeCropImage::class);
 });
 
 it('prevents duplicate images on same day', function () {
@@ -60,11 +74,12 @@ it('prevents duplicate images on same day', function () {
         'image_date' => now()->toDateString(),
     ]);
 
-    actingAs($admin)
+    $this->actingAs($admin)
+        ->withSession(['_token' => 'test-token'])
         ->postJson('/crop-images', [
             'image' => UploadedFile::fake()->image('crop.jpg'),
             'schedule_id' => $schedule->id,
-        ])
+        ], ['X-CSRF-TOKEN' => 'test-token'])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['image']);
 });
@@ -73,11 +88,12 @@ it('validates image file type', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $schedule = Schedule::factory()->create();
 
-    actingAs($admin)
+    $this->actingAs($admin)
+        ->withSession(['_token' => 'test-token'])
         ->postJson('/crop-images', [
             'image' => UploadedFile::fake()->create('document.pdf', 100),
             'schedule_id' => $schedule->id,
-        ])
+        ], ['X-CSRF-TOKEN' => 'test-token'])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['image']);
 });
@@ -86,11 +102,12 @@ it('validates image file size', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $schedule = Schedule::factory()->create();
 
-    actingAs($admin)
+    $this->actingAs($admin)
+        ->withSession(['_token' => 'test-token'])
         ->postJson('/crop-images', [
             'image' => UploadedFile::fake()->image('crop.jpg')->size(11000), // 11MB
             'schedule_id' => $schedule->id,
-        ])
+        ], ['X-CSRF-TOKEN' => 'test-token'])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['image']);
 });
@@ -99,8 +116,9 @@ it('allows admin to delete crop image', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $cropImage = CropImage::factory()->create();
 
-    actingAs($admin)
-        ->deleteJson("/crop-images/{$cropImage->id}")
+    $this->actingAs($admin)
+        ->withSession(['_token' => 'test-token'])
+        ->deleteJson("/crop-images/{$cropImage->id}", [], ['X-CSRF-TOKEN' => 'test-token'])
         ->assertSuccessful();
 
     $this->assertDatabaseMissing('crop_images', [
@@ -112,8 +130,9 @@ it('prevents farmer from deleting images', function () {
     $farmer = User::factory()->create(['role' => 'farmer']);
     $cropImage = CropImage::factory()->create();
 
-    actingAs($farmer)
-        ->deleteJson("/crop-images/{$cropImage->id}")
+    $this->actingAs($farmer)
+        ->withSession(['_token' => 'test-token'])
+        ->deleteJson("/crop-images/{$cropImage->id}", [], ['X-CSRF-TOKEN' => 'test-token'])
         ->assertForbidden();
 });
 
@@ -133,11 +152,12 @@ it('logs analysis errors for debugging', function () {
     $image = new UploadedFile($tempPath, 'test-crop.png', 'image/png', null, true);
 
     // Upload the image (this will use real storage)
-    actingAs($admin)
+    $this->actingAs($admin)
+        ->withSession(['_token' => 'test-token'])
         ->postJson('/crop-images', [
             'image' => $image,
             'schedule_id' => $schedule->id,
-        ])
+        ], ['X-CSRF-TOKEN' => 'test-token'])
         ->assertCreated();
 
     $cropImage = CropImage::first();

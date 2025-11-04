@@ -1,14 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
-import { TrendingUp, TrendingDown, Minus, AlertCircle, DollarSign, Activity, Search } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, AlertCircle, DollarSign, Activity, Search, ArrowRight } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useSetPanelSize } from '@/hooks/use-set-panel-size';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import pricingForecast from '@/routes/pricing-forecast';
 
 interface Price {
     id: number;
@@ -338,11 +340,20 @@ const PricingForecastIndex = () => {
                                     key={commodityData.commodity.id}
                                     className="bg-card rounded-lg border p-4 sm:p-6"
                                 >
-                                    <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                                        <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
-                                        <h2 className="text-lg sm:text-xl font-semibold truncate">
-                                            {commodityData.commodity.name}
-                                        </h2>
+                                    <div className="flex items-center justify-between gap-2 sm:gap-3 mb-4 sm:mb-6">
+                                        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                                            <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+                                            <h2 className="text-lg sm:text-xl font-semibold truncate">
+                                                {commodityData.commodity.name}
+                                            </h2>
+                                        </div>
+                                        <Link href={pricingForecast.show(commodityData.commodity.id)}>
+                                            <Button variant="outline" size="sm" className="flex items-center gap-1 flex-shrink-0">
+                                                <span className="hidden sm:inline">View Full History</span>
+                                                <span className="sm:hidden">Details</span>
+                                                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                                            </Button>
+                                        </Link>
                                     </div>
 
                                     {!hasData ? (
@@ -353,7 +364,7 @@ const PricingForecastIndex = () => {
                                         <>
                                             {/* Price History Chart */}
                                             <div className="mb-6 sm:mb-8 -mx-4 sm:mx-0">
-                                                <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 sm:px-0">Price History</h3>
+                                                <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4 px-4 sm:px-0">Price History (Latest 10 Records)</h3>
                                                 <div className="overflow-x-auto">
                                                     <ChartContainer
                                                         config={chartConfig}

@@ -91,7 +91,7 @@ class CalendarPageController extends Controller
 
         $schedule = Schedule::create($validated);
 
-        return redirect()->route('sensors.show', $schedule->sensor_id)
+        return redirect()->route('calendar.show', $schedule->sensor_id)
             ->with('message', 'Crop schedule created successfully!');
     }
 
