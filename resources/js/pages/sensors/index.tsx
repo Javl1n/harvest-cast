@@ -21,7 +21,7 @@ const SensorsIndex = () => {
           sensors: SensorInterface[];
      }>().props;
 
-     useSetPanelSize(30);
+     useSetPanelSize(40);
 
      // Count sensors by status
      const activePlantingsCount = useMemo(() => {
@@ -186,7 +186,7 @@ const SensorsIndex = () => {
                                                             <div className="grid grid-cols-4 gap-4 mb-4 bg-muted/30 dark:bg-muted/10 rounded-lg p-4">
                                                                  <div>
                                                                       <div className="text-muted-foreground text-xs mb-1">Area</div>
-                                                                      <div className="font-semibold text-base">{sensor.latest_schedule.hectares ?? 0} ha</div>
+                                                                      <div className="font-semibold text-base">{sensor.latest_schedule.acres ?? 0} ac</div>
                                                                  </div>
                                                                  <div>
                                                                       <div className="text-muted-foreground text-xs mb-1">Seeds (kg)</div>

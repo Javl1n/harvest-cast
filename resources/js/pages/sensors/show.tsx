@@ -35,7 +35,7 @@ const SensorsShow = () => {
          latestCropImage?: CropImage | null;
          scheduleId?: number | null;
      }>().props;
-     useSetPanelSize(30);
+     useSetPanelSize(40);
      const filterToSensor = useSetAtom(filterToSensorAtom);
 
      // Filter to show only this sensor on the map

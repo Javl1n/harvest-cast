@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
-import { TrendingUp, TrendingDown, Minus, AlertCircle, DollarSign, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, AlertCircle, DollarSign, Activity, Search } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useSetPanelSize } from '@/hooks/use-set-panel-size';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 
 interface Price {
     id: number;
@@ -112,11 +113,44 @@ const LoadingSkeleton = () => (
 
 const PricingForecastIndex = () => {
     const { forecastData } = usePage<PageProps>().props;
+    const [searchQuery, setSearchQuery] = useState('');
 
     useSetPanelSize(56);
 
     // Show loading skeleton if data is not loaded yet
     const isLoading = !forecastData;
+
+    // Filter forecast data based on search query
+    const filteredForecastData = useMemo(() => {
+        if (!forecastData || !searchQuery.trim()) {
+            return forecastData;
+        }
+
+        const query = searchQuery.toLowerCase().trim();
+
+        return forecastData
+            .map(commodityData => {
+                // Filter variants that match the search query
+                const matchingVariants = commodityData.variants.filter(variant =>
+                    variant.variant.name.toLowerCase().includes(query)
+                );
+
+                // Check if commodity name matches
+                const commodityMatches = commodityData.commodity.name.toLowerCase().includes(query);
+
+                // Include commodity if it matches or has matching variants
+                if (commodityMatches || matchingVariants.length > 0) {
+                    return {
+                        ...commodityData,
+                        // If commodity matches, show all variants; otherwise show only matching variants
+                        variants: commodityMatches ? commodityData.variants : matchingVariants,
+                    };
+                }
+
+                return null;
+            })
+            .filter(Boolean) as CommodityData[];
+    }, [forecastData, searchQuery]);
 
     const getTrendIcon = (trend: string) => {
         switch (trend) {
@@ -250,6 +284,26 @@ const PricingForecastIndex = () => {
                     </div>
                 </div>
 
+                {!isLoading && forecastData && forecastData.length > 0 && (
+                    <div className="mb-4 sm:mb-6">
+                        <div className="relative max-w-md">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                type="text"
+                                placeholder="Search commodities or variants..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9"
+                            />
+                        </div>
+                        {searchQuery && (
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                                Found {filteredForecastData?.length || 0} {filteredForecastData?.length === 1 ? 'commodity' : 'commodities'}
+                            </p>
+                        )}
+                    </div>
+                )}
+
                 {isLoading ? (
                     <LoadingSkeleton />
                 ) : forecastData.length === 0 ? (
@@ -262,9 +316,19 @@ const PricingForecastIndex = () => {
                             Add commodities, variants, and price data to see forecasts.
                         </p>
                     </div>
+                ) : filteredForecastData && filteredForecastData.length === 0 ? (
+                    <div className="text-center py-8 sm:py-12">
+                        <Search className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                        <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2 px-4">
+                            No results found
+                        </h3>
+                        <p className="text-sm sm:text-base text-gray-500 px-4">
+                            Try adjusting your search query to find what you're looking for.
+                        </p>
+                    </div>
                 ) : (
                     <div className="space-y-6 sm:space-y-8">
-                        {forecastData.map((commodityData) => {
+                        {filteredForecastData?.map((commodityData) => {
                             const chartData = prepareChartData(commodityData);
                             const chartConfig = prepareChartConfig(commodityData);
                             const hasData = chartData.length > 0 && commodityData.variants.length > 0;
