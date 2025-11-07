@@ -107,7 +107,7 @@ class CalendarPageController extends Controller
         $yieldForecast = null;
         $incomeForecast = null;
 
-        if ($latestReading) {
+    if ($latestReading) {
             // Get latest weather with caching
             $latestWeather = Cache::remember('latest_weather', 300, function () {
                 return Weather::latest()->first();

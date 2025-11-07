@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useState, useMemo } from 'react';
+import { useEchoPublic } from '@laravel/echo-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
      {
@@ -17,11 +18,31 @@ const breadcrumbs: BreadcrumbItem[] = [
      },
 ];
 const SensorsIndex = () => {
-     const {sensors: sensorsData} = usePage<{
+     const {sensors: initialSensors} = usePage<{
           sensors: SensorInterface[];
      }>().props;
 
      useSetPanelSize(40);
+
+     // State to manage sensors list
+     const [sensorsData, setSensorsData] = useState<SensorInterface[]>(initialSensors);
+
+     // Listen for real-time sensor updates
+     useEchoPublic('sensors', 'SensorUpdated', ({ sensor }: { sensor: SensorInterface }) => {
+          setSensorsData(prevSensors => {
+               const sensorIndex = prevSensors.findIndex(s => s.id === sensor.id);
+
+               if (sensorIndex !== -1) {
+                    // Update existing sensor
+                    const updatedSensors = [...prevSensors];
+                    updatedSensors[sensorIndex] = sensor;
+                    return updatedSensors;
+               }
+
+               // Add new sensor if not found
+               return [...prevSensors, sensor];
+          });
+     });
 
      // Count sensors by status
      const activePlantingsCount = useMemo(() => {

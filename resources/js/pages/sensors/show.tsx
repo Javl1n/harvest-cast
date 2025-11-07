@@ -14,7 +14,8 @@ import { SensorCurrentPlanting } from "@/components/calendar/show/sensor-current
 import { SensorPlantingHistory } from "@/components/calendar/show/sensor-planting-history";
 import { useSetAtom } from "jotai";
 import { filterToSensorAtom } from "@/atoms/sensors-atom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useEchoPublic } from "@laravel/echo-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const SensorsShow = () => {
-     const {sensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, incomeForecast, auth, latestCropImage, scheduleId} = usePage<{
+     const {sensor: initialSensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, incomeForecast, auth, latestCropImage, scheduleId} = usePage<{
          sensor: SensorInterface;
          careRecommendations: CropCareRecommendation[];
          currentConditions: CurrentConditions | null;
@@ -37,6 +38,17 @@ const SensorsShow = () => {
      }>().props;
      useSetPanelSize(40);
      const filterToSensor = useSetAtom(filterToSensorAtom);
+
+     // State to manage sensor data
+     const [sensor, setSensor] = useState<SensorInterface>(initialSensor);
+
+     // Listen for real-time sensor updates
+     useEchoPublic('sensors', 'SensorUpdated', ({ sensor: updatedSensor }: { sensor: SensorInterface }) => {
+          // Only update if this is the sensor we're viewing
+          if (updatedSensor.id === sensor.id) {
+               setSensor(updatedSensor);
+          }
+     });
 
      // Filter to show only this sensor on the map
      useEffect(() => {

@@ -26,8 +26,8 @@ class DatabaseSeeder extends Seeder
             PriceSeeder::class,
             WeatherSeeder::class,
             CropRecommendationSeeder::class,
-            SensorSeeder::class,
-            ScheduleSeeder::class,
+            // SensorSeeder::class,
+            // ScheduleSeeder::class,
         ]);
     }
 }
