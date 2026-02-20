@@ -36,7 +36,7 @@ class CropImagePolicy
      */
     public function update(User $user, CropImage $cropImage): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'farmer';
     }
 
     /**
@@ -44,7 +44,7 @@ class CropImagePolicy
      */
     public function delete(User $user, CropImage $cropImage): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'farmer';
     }
 
     /**
@@ -52,7 +52,7 @@ class CropImagePolicy
      */
     public function restore(User $user, CropImage $cropImage): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'farmer';
     }
 
     /**
@@ -60,6 +60,6 @@ class CropImagePolicy
      */
     public function forceDelete(User $user, CropImage $cropImage): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'farmer';
     }
 }

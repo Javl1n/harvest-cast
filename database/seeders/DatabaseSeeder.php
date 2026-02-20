@@ -21,6 +21,12 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+        User::factory()->create([
+            'name' => 'Farmer',
+            'email' => 'farmer@gmail.com',
+            'role' => 'farmer',
+        ]);
+
         $this->call([
             CommoditySeeder::class,
             PriceSeeder::class,

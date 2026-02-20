@@ -3,8 +3,8 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from '@/components/ui/sidebar';
 import { dashboard, home } from '@/routes';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { SharedData, type NavItem } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Calendar, CircleDot, Folder, LayoutGrid, TrendingUp } from 'lucide-react';
 import AppLogo from './app-logo';
 import calendar from '@/routes/calendar';
@@ -23,6 +23,39 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
+const adminNavItems: NavItem[] = [
+    {
+        title: 'Calendar',
+        href: calendar.index(),
+        icon: Calendar,
+    },
+    {
+        title: 'Pricing Forecast',
+        href: pricingForecast.index(),
+        icon: TrendingUp,
+    },
+];
+
+const farmerNavItems: NavItem[] = [
+    {
+        title: 'Calendar',
+        href: calendar.index(),
+        icon: Calendar,
+    },
+    // {
+    //     title: 'Pricing Forecast',
+    //     href: pricingForecast.index(),
+    //     icon: TrendingUp,
+    // },
+];
+
+const navItems: {
+    [key: string]: NavItem[]
+} = {
+    'admin': adminNavItems,
+    'farmer': farmerNavItems,
+}
+
 const footerNavItems: NavItem[] = [
     // {
     //     title: 'Repository',
@@ -37,6 +70,7 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth: { user } } = usePage<SharedData>().props;
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -52,7 +86,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems[user.role]} />
             </SidebarContent>
 
             <SidebarFooter>

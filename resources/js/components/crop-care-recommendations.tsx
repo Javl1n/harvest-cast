@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CropImageAnalysisDisplay from "@/components/crop-image-analysis-display";
 import CropImageUpload from "@/components/crop-image-upload";
-import { CropImage } from "@/types";
+import { CropImage, SharedData } from "@/types";
 import { usePage } from "@inertiajs/react";
 import {
     Droplets,
@@ -72,7 +72,7 @@ const getIconComponent = (iconName: string) => {
         'leaf': Leaf,
         'bug': Bug,
     };
-    
+
     return icons[iconName] || CheckCircle;
 };
 
@@ -117,7 +117,7 @@ const CropCareRecommendations = ({
     scheduleId
 }: CropCareRecommendationsProps) => {
     const [loading, setLoading] = useState(false);
-    const { auth } = usePage<{ auth: { user: { role: 'admin' | 'farmer' } } }>().props;
+    const { auth } = usePage<SharedData>().props;
     const isAdmin = auth?.user?.role === 'admin';
 
     const refreshRecommendations = async () => {
@@ -134,6 +134,7 @@ const CropCareRecommendations = ({
         }
         const today = new Date().toDateString();
         const imageDate = new Date(image.image_date).toDateString();
+        console.log(today, image.image_date, imageDate)
         return today === imageDate;
     };
 
@@ -146,7 +147,7 @@ const CropCareRecommendations = ({
                 </div>
                 <div className="p-4 bg-muted/10 rounded border border-border/50">
                     <p className="text-sm text-muted-foreground">
-                        {!currentConditions 
+                        {!currentConditions
                             ? "No sensor readings available for care recommendations."
                             : "No active plantings or care recommendations available."
                         }
@@ -185,12 +186,12 @@ const CropCareRecommendations = ({
                     {isImageFromToday(latestCropImage || null) ? (
                         <CropImageAnalysisDisplay
                             image={latestCropImage!}
-                            isAdmin={isAdmin}
+                            isAdmin={true}
                         />
                     ) : (
                         <CropImageUpload
                             scheduleId={scheduleId}
-                            isAdmin={isAdmin}
+                            isAdmin={!isAdmin}
                         />
                     )}
                 </div>
@@ -230,35 +231,32 @@ const CropCareRecommendations = ({
             <div className="space-y-2 max-h-64 overflow-y-auto">
                 {recommendations.map((rec, index) => {
                     const IconComponent = getIconComponent(rec.icon);
-                    
+
                     return (
-                        <div 
-                            key={index} 
-                            className={`p-3 rounded border transition-colors ${
-                                rec.priority === 'high' 
-                                    ? 'bg-red-50/50 border-red-200/50 dark:bg-red-950/20 dark:border-red-800/30' 
-                                    : rec.priority === 'medium'
+                        <div
+                            key={index}
+                            className={`p-3 rounded border transition-colors ${rec.priority === 'high'
+                                ? 'bg-red-50/50 border-red-200/50 dark:bg-red-950/20 dark:border-red-800/30'
+                                : rec.priority === 'medium'
                                     ? 'bg-yellow-50/50 border-yellow-200/50 dark:bg-yellow-950/20 dark:border-yellow-800/30'
                                     : 'bg-green-50/50 border-green-200/50 dark:bg-green-950/20 dark:border-green-800/30'
-                            }`}
+                                }`}
                         >
                             <div className="flex items-start gap-3">
-                                <div className={`p-1.5 rounded ${
-                                    rec.priority === 'high' 
-                                        ? 'bg-red-100 dark:bg-red-900/40' 
-                                        : rec.priority === 'medium'
+                                <div className={`p-1.5 rounded ${rec.priority === 'high'
+                                    ? 'bg-red-100 dark:bg-red-900/40'
+                                    : rec.priority === 'medium'
                                         ? 'bg-yellow-100 dark:bg-yellow-900/40'
                                         : 'bg-green-100 dark:bg-green-900/40'
-                                }`}>
-                                    <IconComponent className={`h-3 w-3 ${
-                                        rec.priority === 'high' 
-                                            ? 'text-red-600 dark:text-red-400' 
-                                            : rec.priority === 'medium'
+                                    }`}>
+                                    <IconComponent className={`h-3 w-3 ${rec.priority === 'high'
+                                        ? 'text-red-600 dark:text-red-400'
+                                        : rec.priority === 'medium'
                                             ? 'text-yellow-600 dark:text-yellow-400'
                                             : 'text-green-600 dark:text-green-400'
-                                    }`} />
+                                        }`} />
                                 </div>
-                                
+
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between mb-1">
                                         <h4 className="text-xs font-medium text-foreground">{rec.action}</h4>
@@ -268,11 +266,11 @@ const CropCareRecommendations = ({
                                             </Badge>
                                         </div>
                                     </div>
-                                    
+
                                     <p className="text-xs text-muted-foreground mb-1">
                                         {rec.description}
                                     </p>
-                                    
+
                                     <div className="flex items-center justify-between">
                                         <span className={`text-[10px] font-medium uppercase tracking-wider ${getCategoryColor(rec.category)}`}>
                                             {rec.category.replace('_', ' ')}
@@ -284,7 +282,7 @@ const CropCareRecommendations = ({
                     );
                 })}
             </div>
-            
+
             {recommendations.length > 0 && (
                 <div className="pt-2 border-t border-border/30">
                     <p className="text-[10px] text-muted-foreground text-center">

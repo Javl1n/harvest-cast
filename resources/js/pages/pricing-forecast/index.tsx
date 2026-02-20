@@ -68,7 +68,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 // Chart colors for consistent theming
 const CHART_COLORS = [
     '#22c55e', // green-500
-    '#16a34a', // green-600  
+    '#16a34a', // green-600
     '#15803d', // green-700
     '#166534', // green-800
     '#14532d', // green-900
@@ -191,7 +191,7 @@ const PricingForecastIndex = () => {
             year: 'numeric',
         }).format(new Date(dateString));
     };
-    
+
     const formatTooltipDate = (dateString: string) => {
         return new Intl.DateTimeFormat('en-US', {
             month: 'short',
@@ -205,6 +205,8 @@ const PricingForecastIndex = () => {
         const chartData: { [key: string]: unknown }[] = [];
         const dateSet = new Set<string>();
 
+
+
         // Collect all unique dates from all variants
         commodityData.variants.forEach(variant => {
             variant.price_history.forEach(price => {
@@ -214,7 +216,7 @@ const PricingForecastIndex = () => {
 
         // Sort dates chronologically
         const sortedDates = Array.from(dateSet).sort();
-        
+
         // Group dates by month for cleaner x-axis display
         const monthMap = new Map<string, string[]>();
         sortedDates.forEach(date => {
@@ -229,21 +231,21 @@ const PricingForecastIndex = () => {
         sortedDates.forEach((date, index) => {
             const monthKey = formatDate(date);
             const isFirstInMonth = monthMap.get(monthKey)![0] === date;
-            
-            const dataPoint: { [key: string]: unknown } = { 
+
+            const dataPoint: { [key: string]: unknown } = {
                 date: monthKey, // This will show month-year format
                 fullDate: date, // Keep the full date for internal reference
                 isFirstInMonth: isFirstInMonth,
                 index: index
             };
-            
+
             commodityData.variants.forEach(variant => {
                 const priceForDate = variant.price_history.find(p => p.date === date);
                 if (priceForDate) {
                     dataPoint[variant.variant.name] = priceForDate.price;
                 }
             });
-            
+
             chartData.push(dataPoint);
         });
 
@@ -253,9 +255,9 @@ const PricingForecastIndex = () => {
     // Prepare chart config using the theme colors
     const prepareChartConfig = (commodityData: CommodityData) => {
         const config: { [key: string]: { label: string; color: string } } = {};
-        
+
         // Use shared chart colors
-        
+
         commodityData.variants.forEach((variant, index) => {
             const colorIndex = index % CHART_COLORS.length;
             config[variant.variant.name] = {
@@ -263,7 +265,7 @@ const PricingForecastIndex = () => {
                 color: CHART_COLORS[colorIndex],
             };
         });
-        
+
         return config;
     };
 
@@ -406,56 +408,56 @@ const PricingForecastIndex = () => {
                                                                 tick={{ fontSize: 10 }}
                                                                 tickFormatter={(value) => `₱${value}`}
                                                             />
-                                                        <ChartTooltip
-                                                            cursor={false}
-                                                            content={
-                                                                <ChartTooltipContent
-                                                                    indicator="line"
-                                                                    formatter={(value, name) => [
-                                                                        formatCurrency(Number(value)),
-                                                                        name,
-                                                                    ]}
-                                                                    labelFormatter={(label, payload) => {
-                                                                        if (payload && payload[0] && payload[0].payload) {
-                                                                            const fullDate = payload[0].payload.fullDate;
-                                                                            return fullDate ? formatTooltipDate(fullDate) : label;
-                                                                        }
-                                                                        return label;
-                                                                    }}
-                                                                />
-                                                            }
-                                                        />
-                                                        <ChartLegend content={<ChartLegendContent />} />
-                                        {commodityData.variants.map((variant, index) => {
-                                                            const colorIndex = index % 5;
-                                                            const color = CHART_COLORS[colorIndex];
-                                                            
-                                                            return (
-                                                                <Line
-                                                                    key={variant.variant.id}
-                                                                    dataKey={variant.variant.name}
-                                                                    type="monotone"
-                                                                    stroke={color}
-                                                                    strokeWidth={2}
-                                                                    dot={{
-                                                                        fill: color,
-                                                                        strokeWidth: 0,
-                                                                        r: 0,
-                                                                    }}
-                                                                    activeDot={{
-                                                                        r: 6,
-                                                                    }}
-                                                                    connectNulls={false}
-                                                                />
-                                                            );
-                                                        })}
-                                                    </LineChart>
-                                                </ChartContainer>
+                                                            <ChartTooltip
+                                                                cursor={false}
+                                                                content={
+                                                                    <ChartTooltipContent
+                                                                        indicator="line"
+                                                                        formatter={(value, name) => [
+                                                                            formatCurrency(Number(value)),
+                                                                            name,
+                                                                        ]}
+                                                                        labelFormatter={(label, payload) => {
+                                                                            if (payload && payload[0] && payload[0].payload) {
+                                                                                const fullDate = payload[0].payload.fullDate;
+                                                                                return fullDate ? formatTooltipDate(fullDate) : label;
+                                                                            }
+                                                                            return label;
+                                                                        }}
+                                                                    />
+                                                                }
+                                                            />
+                                                            <ChartLegend content={<ChartLegendContent />} />
+                                                            {commodityData.variants.map((variant, index) => {
+                                                                const colorIndex = index % 5;
+                                                                const color = CHART_COLORS[colorIndex];
+
+                                                                return (
+                                                                    <Line
+                                                                        key={variant.variant.id}
+                                                                        dataKey={variant.variant.name}
+                                                                        type="monotone"
+                                                                        stroke={color}
+                                                                        strokeWidth={2}
+                                                                        dot={{
+                                                                            fill: color,
+                                                                            strokeWidth: 0,
+                                                                            r: 0,
+                                                                        }}
+                                                                        activeDot={{
+                                                                            r: 6,
+                                                                        }}
+                                                                        connectNulls={false}
+                                                                    />
+                                                                );
+                                                            })}
+                                                        </LineChart>
+                                                    </ChartContainer>
                                                 </div>
                                             </div>
 
                                             {/* Variants Summary */}
-                                            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                                            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-2">
                                                 {commodityData.variants.map((variantData, index) => (
                                                     <div
                                                         key={variantData.variant.id}
@@ -509,13 +511,12 @@ const PricingForecastIndex = () => {
                                                                         Price Change
                                                                     </span>
                                                                     <span
-                                                                        className={`text-xs sm:text-sm font-medium ${
-                                                                            variantData.forecast.price_change_percent > 0
-                                                                                ? 'text-green-600'
-                                                                                : variantData.forecast.price_change_percent < 0
+                                                                        className={`text-xs sm:text-sm font-medium ${variantData.forecast.price_change_percent > 0
+                                                                            ? 'text-green-600'
+                                                                            : variantData.forecast.price_change_percent < 0
                                                                                 ? 'text-red-600'
                                                                                 : 'text-gray-600'
-                                                                        }`}
+                                                                            }`}
                                                                     >
                                                                         {variantData.forecast.price_change_percent > 0 ? '+' : ''}
                                                                         {variantData.forecast.price_change_percent.toFixed(1)}%
@@ -531,22 +532,22 @@ const PricingForecastIndex = () => {
 
                                                                     {/* Daily forecasts */}
                                                                     <div className="space-y-0.5 sm:space-y-1 mb-2 sm:mb-3">
-                                                                        <div className="text-xs text-muted-foreground font-medium">Daily</div>
+                                                                        <div className="text-xs text-muted-foreground font-medium">Weekly</div>
                                                                         {variantData.forecast.forecasts
                                                                             .filter(f => f.type === 'daily')
                                                                             .map((forecast, index) => (
-                                                                            <div
-                                                                                key={`daily-${index}`}
-                                                                                className="flex justify-between text-xs pl-1.5 sm:pl-2 gap-2"
-                                                                            >
-                                                                                <span className="text-muted-foreground">
-                                                                                    {forecast.days_ahead}d
-                                                                                </span>
-                                                                                <span className="font-medium">
-                                                                                    {formatCurrency(forecast.price)}
-                                                                                </span>
-                                                                            </div>
-                                                                        ))}
+                                                                                <div
+                                                                                    key={`daily-${index}`}
+                                                                                    className="flex justify-between text-xs pl-1.5 sm:pl-2 gap-2"
+                                                                                >
+                                                                                    <span className="text-muted-foreground">
+                                                                                        {forecast.days_ahead as number / 7}wk
+                                                                                    </span>
+                                                                                    <span className="font-medium">
+                                                                                        {formatCurrency(forecast.price)}
+                                                                                    </span>
+                                                                                </div>
+                                                                            ))}
                                                                     </div>
 
                                                                     {/* Monthly forecasts */}
@@ -555,18 +556,18 @@ const PricingForecastIndex = () => {
                                                                         {variantData.forecast.forecasts
                                                                             .filter(f => f.type === 'monthly')
                                                                             .map((forecast, index) => (
-                                                                            <div
-                                                                                key={`monthly-${index}`}
-                                                                                className="flex justify-between text-xs pl-1.5 sm:pl-2 gap-2"
-                                                                            >
-                                                                                <span className="text-muted-foreground">
-                                                                                    {forecast.months_ahead}mo
-                                                                                </span>
-                                                                                <span className="font-medium">
-                                                                                    {formatCurrency(forecast.price)}
-                                                                                </span>
-                                                                            </div>
-                                                                        ))}
+                                                                                <div
+                                                                                    key={`monthly-${index}`}
+                                                                                    className="flex justify-between text-xs pl-1.5 sm:pl-2 gap-2"
+                                                                                >
+                                                                                    <span className="text-muted-foreground">
+                                                                                        {forecast.months_ahead}mo
+                                                                                    </span>
+                                                                                    <span className="font-medium">
+                                                                                        {formatCurrency(forecast.price)}
+                                                                                    </span>
+                                                                                </div>
+                                                                            ))}
                                                                     </div>
                                                                 </div>
                                                             )}

@@ -25,115 +25,114 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const SensorsShow = () => {
-     const {sensor: initialSensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, incomeForecast, auth, latestCropImage, scheduleId} = usePage<{
-         sensor: SensorInterface;
-         careRecommendations: CropCareRecommendation[];
-         currentConditions: CurrentConditions | null;
-         hasCareRecommendations: boolean;
-         yieldForecast: YieldForecast | null;
-         incomeForecast: IncomeForecast | null;
-         auth: { user: { id: number; name: string; email: string; role: 'admin' | 'farmer' } | null };
-         latestCropImage?: CropImage | null;
-         scheduleId?: number | null;
-     }>().props;
-     useSetPanelSize(40);
-     const filterToSensor = useSetAtom(filterToSensorAtom);
+    const { sensor: initialSensor, careRecommendations, currentConditions, hasCareRecommendations, yieldForecast, incomeForecast, auth, latestCropImage, scheduleId } = usePage<{
+        sensor: SensorInterface;
+        careRecommendations: CropCareRecommendation[];
+        currentConditions: CurrentConditions | null;
+        hasCareRecommendations: boolean;
+        yieldForecast: YieldForecast | null;
+        incomeForecast: IncomeForecast | null;
+        auth: { user: { id: number; name: string; email: string; role: 'admin' | 'farmer' } | null };
+        latestCropImage?: CropImage | null;
+        scheduleId?: number | null;
+    }>().props;
+    useSetPanelSize(40);
+    const filterToSensor = useSetAtom(filterToSensorAtom);
 
-     // State to manage sensor data
-     const [sensor, setSensor] = useState<SensorInterface>(initialSensor);
+    // State to manage sensor data
+    const [sensor, setSensor] = useState<SensorInterface>(initialSensor);
 
-     // Listen for real-time sensor updates
-     useEchoPublic('sensors', 'SensorUpdated', ({ sensor: updatedSensor }: { sensor: SensorInterface }) => {
-          // Only update if this is the sensor we're viewing
-          if (updatedSensor.id === sensor.id) {
-               setSensor(updatedSensor);
-          }
-     });
+    // Listen for real-time sensor updates
+    useEchoPublic('sensors', 'SensorUpdated', ({ sensor: updatedSensor }: { sensor: SensorInterface }) => {
+        // Only update if this is the sensor we're viewing
+        if (updatedSensor.id === sensor.id) {
+            setSensor(updatedSensor);
+        }
+    });
 
-     // Filter to show only this sensor on the map
-     useEffect(() => {
-          filterToSensor(sensor.id);
+    // Filter to show only this sensor on the map
+    useEffect(() => {
+        filterToSensor(sensor.id);
 
-          // Cleanup: Show all sensors when leaving this page
-          return () => {
-               filterToSensor(null);
-          };
-     }, [sensor.id, filterToSensor]);
+        // Cleanup: Show all sensors when leaving this page
+        return () => {
+            filterToSensor(null);
+        };
+    }, [sensor.id, filterToSensor]);
 
-     useFlyToLocation(
-          sensor.latest_reading?.latitude,
-          sensor.latest_reading?.longitude,
-          {
-               zoom: 18,
-               duration: 1500,
-               offset: [window.innerWidth * 0.15, 0]
-          }
-     );
+    useFlyToLocation(
+        sensor.latest_reading?.latitude,
+        sensor.latest_reading?.longitude,
+        {
+            zoom: 18,
+            duration: 1500,
+            offset: [window.innerWidth * 0.15, 0]
+        }
+    );
 
-     const hasPlantings = Boolean(sensor.schedules && sensor.schedules.length > 0);
-     const latestSchedule = sensor.latest_schedule;
-     const isCurrentPlantingHarvested = Boolean(latestSchedule?.actual_harvest_date);
-     const isAdmin = auth?.user?.role === 'admin';
+    const hasPlantings = Boolean(sensor.schedules && sensor.schedules.length > 0);
+    const latestSchedule = sensor.latest_schedule;
+    const isCurrentPlantingHarvested = Boolean(latestSchedule?.actual_harvest_date);
+    const isAdmin = auth?.user?.role === 'admin';
 
+    return (
+        <>
+            <Head title={`Sensor ${sensor.id.substring(0, 8)}`} />
+            <div className="p-4 space-y-4">
+                <SensorHeader sensorId={sensor.id} />
 
-     return (
-          <>
-               <Head title={`Sensor ${sensor.id.substring(0, 8)}`} />
-               <div className="p-4 space-y-4">
-                    <SensorHeader sensorId={sensor.id} />
+                <SensorCurrentStatus latestReading={sensor.latest_reading} />
 
-                    <SensorCurrentStatus latestReading={sensor.latest_reading} />
+                <SensorQuickStats
+                    readingsCount={sensor.readings?.length || 0}
+                    schedulesCount={sensor.schedules?.length || 0}
+                    createdAt={sensor.created_at}
+                    latestReading={sensor.latest_reading}
+                />
 
-                    <SensorQuickStats
-                         readingsCount={sensor.readings?.length || 0}
-                         schedulesCount={sensor.schedules?.length || 0}
-                         createdAt={sensor.created_at}
-                         latestReading={sensor.latest_reading}
+                <SensorCurrentPlanting
+                    sensor={sensor}
+                    hasPlantings={hasPlantings}
+                    latestSchedule={latestSchedule}
+                    isCurrentPlantingHarvested={isCurrentPlantingHarvested}
+                    isAdmin={!isAdmin}
+                />
+
+                {/* Yield Forecast */}
+                {isAdmin && yieldForecast && !isCurrentPlantingHarvested && (
+                    <YieldForecastCard
+                        forecast={yieldForecast}
+                        cropName={latestSchedule?.commodity?.name}
                     />
+                )}
 
-                    <SensorCurrentPlanting
-                         sensor={sensor}
-                         hasPlantings={hasPlantings}
-                         latestSchedule={latestSchedule}
-                         isCurrentPlantingHarvested={isCurrentPlantingHarvested}
-                         isAdmin={isAdmin}
+                {/* Income Forecast */}
+                {isAdmin && incomeForecast && !isCurrentPlantingHarvested && (
+                    <IncomeForecastCard
+                        forecast={incomeForecast}
+                        cropName={latestSchedule?.commodity?.name}
                     />
+                )}
 
-                    {/* Yield Forecast */}
-                    {yieldForecast && !isCurrentPlantingHarvested && (
-                         <YieldForecastCard
-                              forecast={yieldForecast}
-                              cropName={latestSchedule?.commodity?.name}
-                         />
-                    )}
+                {/* Crop Care Recommendations */}
+                {hasCareRecommendations && (
+                    <CropCareRecommendations
+                        recommendations={careRecommendations}
+                        currentConditions={currentConditions}
+                        cropName={latestSchedule?.commodity?.name}
+                        daysSincePlanting={latestSchedule?.date_planted
+                            ? Math.floor((new Date().getTime() - new Date(latestSchedule.date_planted).getTime()) / (1000 * 60 * 60 * 24))
+                            : undefined
+                        }
+                        latestCropImage={latestCropImage}
+                        scheduleId={scheduleId}
+                    />
+                )}
 
-                    {/* Income Forecast */}
-                    {incomeForecast && !isCurrentPlantingHarvested && (
-                         <IncomeForecastCard
-                              forecast={incomeForecast}
-                              cropName={latestSchedule?.commodity?.name}
-                         />
-                    )}
-
-                    {/* Crop Care Recommendations */}
-                    {hasCareRecommendations && (
-                         <CropCareRecommendations
-                              recommendations={careRecommendations}
-                              currentConditions={currentConditions}
-                              cropName={latestSchedule?.commodity?.name}
-                              daysSincePlanting={latestSchedule?.date_planted
-                                   ? Math.floor((new Date().getTime() - new Date(latestSchedule.date_planted).getTime()) / (1000 * 60 * 60 * 24))
-                                   : undefined
-                              }
-                              latestCropImage={latestCropImage}
-                              scheduleId={scheduleId}
-                         />
-                    )}
-
-                    <SensorPlantingHistory schedules={sensor.schedules || []} />
-               </div>
-          </>
-     )
+                <SensorPlantingHistory schedules={sensor.schedules || []} />
+            </div>
+        </>
+    )
 };
 
 SensorsShow.layout = (page: any) => <AppLayout children={page} breadcrumbs={breadcrumbs} />

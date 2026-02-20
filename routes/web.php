@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/harvest/{schedule}', 'harvest')->name('harvest');
         });
 
-    Route::prefix('/pricing-forecast')->name('pricing-forecast.')->controller(PricingForecastController::class)
+    Route::prefix('/pricing-forecast')->name('pricing-forecast.')->middleware('admin')->controller(PricingForecastController::class)
         ->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/{commodity}', 'show')->name('show');
@@ -37,12 +37,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('/crop-images')->name('crop-images.')->controller(CropImageController::class)
         ->group(function () {
+            Route::get('/{image}', 'show')->name('show');
             Route::post('/', 'store')->name('store');
-            Route::delete('/{image}', 'destroy')->middleware('admin')->name('destroy');
+            Route::delete('/{image}', 'destroy')->name('destroy');
         });
 
-    Route::get('/crop-images/{image}', [CropImageController::class, 'show'])->name('crop-images.show');
+    // Route::get('/crop-images/{image}', [CropImageController::class, 'show'])->name('crop-images.show');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

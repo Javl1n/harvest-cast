@@ -45,7 +45,7 @@ class CalendarPageController extends Controller
             });
 
             // Cache recommendations for 10 minutes
-            $cacheKey = "crop_rec_create_{$sensor->id}_{$latestReading->id}_".($latestWeather?->id ?? 'no_weather');
+            $cacheKey = "crop_rec_create_{$sensor->id}_{$latestReading->id}_" . ($latestWeather?->id ?? 'no_weather');
 
             $recommendations = Cache::remember($cacheKey, 600, function () use ($cropService, $latestReading, $latestWeather) {
                 return $cropService->getRecommendations(
@@ -107,7 +107,7 @@ class CalendarPageController extends Controller
         $yieldForecast = null;
         $incomeForecast = null;
 
-    if ($latestReading) {
+        if ($latestReading) {
             // Get latest weather with caching
             $latestWeather = Cache::remember('latest_weather', 300, function () {
                 return Weather::latest()->first();
@@ -151,6 +151,7 @@ class CalendarPageController extends Controller
             $latestCropImage = $latestSchedule->latestImage;
             $scheduleId = $latestSchedule->id;
         }
+
 
         return inertia()->render('sensors/show', [
             'sensor' => $sensor->load('readings', 'latestReading', 'schedules.commodity', 'latestSchedule.commodity'),
@@ -211,7 +212,7 @@ class CalendarPageController extends Controller
         });
 
         // Use shorter cache for API requests (5 minutes)
-        $cacheKey = "api_crop_rec_{$sensor->id}_{$latestReading->id}_".($latestWeather?->id ?? 'no_weather');
+        $cacheKey = "api_crop_rec_{$sensor->id}_{$latestReading->id}_" . ($latestWeather?->id ?? 'no_weather');
 
         $recommendations = Cache::remember($cacheKey, 300, function () use ($cropService, $latestReading, $latestWeather) {
             return $cropService->getRecommendations(
