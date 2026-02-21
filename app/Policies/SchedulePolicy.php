@@ -29,7 +29,7 @@ class SchedulePolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isFarmer();
     }
 
     /**
@@ -37,7 +37,7 @@ class SchedulePolicy
      */
     public function update(User $user, Schedule $schedule): bool
     {
-        return $user->isAdmin();
+        return $user->isFarmer();
     }
 
     /**
@@ -45,7 +45,7 @@ class SchedulePolicy
      */
     public function delete(User $user, Schedule $schedule): bool
     {
-        return $user->isAdmin();
+        return $user->isFarmer();
     }
 
     /**
@@ -53,7 +53,7 @@ class SchedulePolicy
      */
     public function restore(User $user, Schedule $schedule): bool
     {
-        return $user->isAdmin();
+        return $user->isFarmer();
     }
 
     /**
@@ -61,6 +61,6 @@ class SchedulePolicy
      */
     public function forceDelete(User $user, Schedule $schedule): bool
     {
-        return $user->isAdmin();
+        return $user->isFarmer();
     }
 }

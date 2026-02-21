@@ -22,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
     Route::prefix('/crops')->name('crops.')->controller(CalendarPageController::class)
-        ->middleware('admin')
+        ->middleware('farmer')
         ->group(function () {
             Route::get('/create/sensor/{sensor}', 'create')->name('create');
             Route::post('/', 'store')->name('store');
