@@ -29,7 +29,7 @@ class SensorPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class SensorPolicy
      */
     public function update(User $user, Sensor $sensor): bool
     {
-        return $user->isAdmin();
+        return true;
     }
 
     /**
@@ -45,7 +45,7 @@ class SensorPolicy
      */
     public function delete(User $user, Sensor $sensor): bool
     {
-        return $user->isAdmin();
+        return true;
     }
 
     /**
@@ -53,7 +53,7 @@ class SensorPolicy
      */
     public function restore(User $user, Sensor $sensor): bool
     {
-        return $user->isAdmin();
+        return true;
     }
 
     /**
@@ -61,6 +61,6 @@ class SensorPolicy
      */
     public function forceDelete(User $user, Sensor $sensor): bool
     {
-        return $user->isAdmin();
+        return true;
     }
 }
