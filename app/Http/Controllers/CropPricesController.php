@@ -22,10 +22,10 @@ class CropPricesController extends Controller
 
         // Check if there are already price records for this date (unless forced)
         $force = $request->boolean('force', false);
-        
+
         if (!$force) {
             $existingPricesCount = Price::whereDate('date', $date)->count();
-            
+
             if ($existingPricesCount > 0) {
                 return response()->json([
                     'message' => 'Price records already exist for this date. Use "force: true" to override.',
@@ -39,20 +39,19 @@ class CropPricesController extends Controller
         $records = collect($request->data)->filter(function (array $value, int $key) {
 
             $excludedCategories = [
-                'Fish Products', 
-                'Beef Meat Products', 
-                'Pork Meat Products', 
-                'Products', 
+                'Fish Products',
+                'Beef Meat Products',
+                'Pork Meat Products',
+                'Products',
                 'Poultry Products',
                 // 'Lowland Vegetables',
                 // 'Highland Vegetables',
-                'Spices', 
-                'Fruits', 
+                // 'Spices',
+                'Fruits',
                 'Other Basic Commodities'
             ];
 
             return ($value["category"] && !in_array($value['category'], $excludedCategories));
-
         })->values()->toArray();
 
         // dump($records);
@@ -60,7 +59,7 @@ class CropPricesController extends Controller
         $prompt = <<<PROMPT
         ### RAW INPUT DATA
         PROMPT;
-        
+
         $prompt .= json_encode($records, JSON_PRETTY_PRINT);
 
         // dump($prompt);

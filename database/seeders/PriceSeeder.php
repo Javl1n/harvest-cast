@@ -12,15 +12,79 @@ use Carbon\Carbon;
 class PriceSeeder extends Seeder
 {
     /**
+     * Define which commodity types to include when importing prices.
+     * Set to null to include all commodities, or provide an array to filter.
+     * This should match the filter in CommoditySeeder.
+     */
+    protected function getAllowedCommodities(): ?array
+    {
+        // Return null to allow all commodities
+        // Or return an array of commodity names to filter
+        return [
+            // 'Rice',
+            // 'Corn',
+            // 'Ampalaya',
+            // 'Eggplant',
+            // 'Pechay',
+            // 'Pechay Baguio',
+            'Pole Sitao',
+            // 'Squash',
+            // 'Tomato',
+            // 'Bell Pepper',
+            // 'Broccoli',
+            // 'Cauliflower',
+            // 'Cabbage',
+            // 'Carrots',
+            // 'Celery',
+            // 'Chayote',
+            // 'Habichuelas/Baguio Beans',
+            // 'Lettuce',
+            // 'White Potato',
+            // Spices
+            'Chili',
+            // 'Ginger',
+            // 'Garlic',
+            // 'Red Onion',
+            // 'White Onion',
+            // 'Spring Onion',
+            // Highland Vegetables
+            'Sweet Potato',
+            // 'Radish',
+            // 'Leeks',
+            // 'Mustard Greens',
+            // 'Snap Peas',
+            // 'Snow Peas',
+            // 'Turnip',
+            // Add more commodities here as needed
+        ];
+    }
+
+    /**
+     * Check if a commodity should be imported based on the filter.
+     */
+    protected function shouldImportCommodity(string $commodityName): bool
+    {
+        $allowedCommodities = $this->getAllowedCommodities();
+
+        // If null, allow all commodities
+        if ($allowedCommodities === null) {
+            return true;
+        }
+
+        // Otherwise check if it's in the allowed list
+        return in_array(trim($commodityName), $allowedCommodities);
+    }
+
+    /**
      * Run the database seeds.
      */
     public function run(): void
     {
         $this->command->info('Starting price import from CSV...');
-        
+
         // Default CSV file path
         $csvFile = 'exports/prices_export.csv';
-        
+
         // Check if file exists
         if (!Storage::disk('local')->exists($csvFile)) {
             $this->command->error("CSV file not found: storage/app/private/{$csvFile}");
@@ -44,6 +108,7 @@ class PriceSeeder extends Seeder
 
         $imported = 0;
         $skipped = 0;
+        $filtered = 0;
         $errors = 0;
 
         // Process each row
@@ -51,10 +116,16 @@ class PriceSeeder extends Seeder
             try {
                 // Extract data from CSV row
                 list($date, $commodityName, $variantName, $price, $createdAt, $updatedAt) = $row;
-                
+
                 // Skip if essential data is missing
                 if (empty($date) || empty($commodityName) || empty($variantName) || empty($price)) {
                     $skipped++;
+                    continue;
+                }
+
+                // Check if this commodity should be imported
+                if (!$this->shouldImportCommodity($commodityName)) {
+                    $filtered++;
                     continue;
                 }
 
@@ -98,12 +169,11 @@ class PriceSeeder extends Seeder
                 if ($imported % 50 === 0) {
                     $this->command->line("Processed {$imported} records...");
                 }
-
             } catch (\Exception $e) {
                 $errors++;
                 $this->command->error("Error processing row: " . $e->getMessage());
                 $this->command->error("Row data: " . implode(', ', $row));
-                
+
                 // Stop if too many errors
                 if ($errors > 10) {
                     $this->command->error('Too many errors. Stopping import.');
@@ -118,10 +188,16 @@ class PriceSeeder extends Seeder
         $this->command->info("\n📊 Import Summary:");
         $this->command->line("✅ Successfully imported: {$imported} records");
         $this->command->line("⏭️  Skipped (missing data): {$skipped} records");
+        $this->command->line("🔍 Filtered (not in allowed list): {$filtered} records");
         $this->command->line("❌ Errors: {$errors} records");
-        
+
         if ($imported > 0) {
             $this->command->info("\n🎉 Price import completed successfully!");
         }
+
+        if ($this->getAllowedCommodities() !== null) {
+            $this->command->info("\n💡 Tip: To import all commodities, set getAllowedCommodities() to return null");
+        }
     }
 }
+

@@ -9,6 +9,51 @@ use Illuminate\Database\Seeder;
 class CommoditySeeder extends Seeder
 {
     /**
+     * Define which commodity types to include in the system.
+     * Comment out or remove commodities you don't want to seed.
+     */
+    protected function getAllowedCommodities(): array
+    {
+        return [
+            // 'Rice',
+            // 'Corn',
+            // 'Ampalaya',
+            // 'Eggplant',
+            // 'Pechay',
+            // 'Pechay Baguio',
+            'Pole Sitao',
+            // 'Squash',
+            // 'Tomato',
+            // 'Bell Pepper',
+            // 'Broccoli',
+            // 'Cauliflower',
+            // 'Cabbage',
+            // 'Carrots',
+            // 'Celery',
+            // 'Chayote',
+            // 'Habichuelas/Baguio Beans',
+            // 'Lettuce',
+            // 'White Potato',
+            // Spices
+            'Chili',
+            // 'Ginger',
+            // 'Garlic',
+            // 'Red Onion',
+            // 'White Onion',
+            // 'Spring Onion',
+            // Highland Vegetables
+            'Sweet Potato',
+            // 'Radish',
+            // 'Leeks',
+            // 'Mustard Greens',
+            // 'Snap Peas',
+            // 'Snow Peas',
+            // 'Turnip',
+            // Add more commodities here as needed
+        ];
+    }
+
+    /**
      * Run the database seeds.
      */
     public function run(): void
@@ -85,14 +130,83 @@ class CommoditySeeder extends Seeder
             "White Potato" => [
                 "Local 10-12 pcs/kg"
             ],
+            // Spices
+            "Chili" => [
+                // "Green Siling Labuyo/Palay",
+                // "Red Siling Labuyo/Palay",
+                "Green Siling Haba",
+                // "Red Siling Haba"
+            ],
+            "Ginger" => [
+                "Hawaiian",
+                "Native"
+            ],
+            "Garlic" => [
+                "Imported",
+                "Native"
+            ],
+            "Red Onion" => [
+                "Imported Medium (50-100 g)",
+                "Native Medium (50-100 g)"
+            ],
+            "White Onion" => [
+                "Imported Medium (50-100 g)"
+            ],
+            "Spring Onion" => [
+                "Spring Onion"
+            ],
+            // Highland Vegetables
+            "Sweet Potato" => [
+                "Kamote, Yellow Flesh",
+                "Kamote, White Flesh",
+                "Kamote, Purple Flesh"
+            ],
+            "Radish" => [
+                "White Radish/Labanos",
+                "Red Radish"
+            ],
+            "Leeks" => [
+                "Medium (301-500 g)"
+            ],
+            "Mustard Greens" => [
+                "Mustasa, 3-4 Small Bundles"
+            ],
+            "Snap Peas" => [
+                "Local"
+            ],
+            "Snow Peas" => [
+                "Local"
+            ],
+            "Turnip" => [
+                "Singkamas, Medium (301-500 g)"
+            ],
         ];
 
-        foreach ($commodities as $commodityName => $variants) {
+        $allowedCommodities = $this->getAllowedCommodities();
+        $filteredCommodities = array_filter(
+            $commodities,
+            fn($commodityName) => in_array($commodityName, $allowedCommodities),
+            ARRAY_FILTER_USE_KEY
+        );
+
+        $this->command->info("Seeding " . count($filteredCommodities) . " out of " . count($commodities) . " available commodities...");
+
+        foreach ($filteredCommodities as $commodityName => $variants) {
             $commodity = Commodity::create([
                 "name" => $commodityName,
             ]);
 
             $commodity->variants()->createMany(collect($variants)->map(fn($variant) => ["name" => $variant])->toArray());
+
+            $this->command->info("✓ Created commodity: {$commodityName} with " . count($variants) . " variant(s)");
+        }
+
+        $this->command->info("\n✅ Commodity seeding completed!");
+
+        // Show which commodities were skipped
+        $skipped = array_diff(array_keys($commodities), $allowedCommodities);
+        if (!empty($skipped)) {
+            $this->command->warn("\n⏭️  Skipped commodities: " . implode(', ', $skipped));
         }
     }
 }
