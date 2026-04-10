@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\CropRecommendation;
 use App\Models\Commodity;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\CropRecommendation;
 use Illuminate\Database\Seeder;
 
 class CropRecommendationSeeder extends Seeder
@@ -26,7 +25,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '120-150 days',
                 'harvest_days' => 135,
                 'optimal_conditions' => 'Flooded fields with warm temperatures and high humidity',
-                'water_requirements' => 'Very High - requires continuous flooding'
+                'water_requirements' => 'Very High - requires continuous flooding',
             ],
             'Corn' => [
                 'moisture_min' => 50, 'moisture_max' => 70,
@@ -39,7 +38,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '90-120 days',
                 'harvest_days' => 105,
                 'optimal_conditions' => 'Well-drained soil with warm temperatures and moderate rainfall',
-                'water_requirements' => 'Moderate - requires consistent moisture during grain filling'
+                'water_requirements' => 'Moderate - requires consistent moisture during grain filling',
             ],
             'Ampalaya' => [
                 'moisture_min' => 60, 'moisture_max' => 80,
@@ -52,7 +51,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '55-75 days',
                 'harvest_days' => 65,
                 'optimal_conditions' => 'Hot, humid climate with well-draining soil',
-                'water_requirements' => 'High - consistent moisture during fruit development'
+                'water_requirements' => 'High - consistent moisture during fruit development',
             ],
             'Eggplant' => [
                 'moisture_min' => 65, 'moisture_max' => 85,
@@ -65,7 +64,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '70-85 days',
                 'harvest_days' => 78,
                 'optimal_conditions' => 'Warm temperatures with high humidity and rich soil',
-                'water_requirements' => 'High - requires consistent moisture'
+                'water_requirements' => 'High - requires consistent moisture',
             ],
             'Pechay' => [
                 'moisture_min' => 70, 'moisture_max' => 85,
@@ -78,7 +77,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '30-45 days',
                 'harvest_days' => 38,
                 'optimal_conditions' => 'Cool, moist conditions with partial shade in hot weather',
-                'water_requirements' => 'High - consistent moisture for tender leaves'
+                'water_requirements' => 'High - consistent moisture for tender leaves',
             ],
             'Pechay Baguio' => [
                 'moisture_min' => 70, 'moisture_max' => 85,
@@ -91,7 +90,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '35-50 days',
                 'harvest_days' => 43,
                 'optimal_conditions' => 'Cool temperatures with high humidity and rich soil',
-                'water_requirements' => 'High - consistent moisture essential'
+                'water_requirements' => 'High - consistent moisture essential',
             ],
             'Pole Sitao' => [
                 'moisture_min' => 55, 'moisture_max' => 75,
@@ -104,7 +103,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '60-75 days',
                 'harvest_days' => 68,
                 'optimal_conditions' => 'Warm weather with good air circulation',
-                'water_requirements' => 'Moderate - avoid overwatering'
+                'water_requirements' => 'Moderate - avoid overwatering',
             ],
             'Squash' => [
                 'moisture_min' => 60, 'moisture_max' => 80,
@@ -117,7 +116,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '50-90 days',
                 'harvest_days' => 70,
                 'optimal_conditions' => 'Warm temperatures with rich, well-draining soil',
-                'water_requirements' => 'High - requires consistent moisture during fruit development'
+                'water_requirements' => 'High - requires consistent moisture during fruit development',
             ],
             'Tomato' => [
                 'moisture_min' => 60, 'moisture_max' => 80,
@@ -130,7 +129,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '60-80 days',
                 'harvest_days' => 70,
                 'optimal_conditions' => 'Warm, sunny location with consistent watering',
-                'water_requirements' => 'Moderate - consistent moisture, avoid waterlogging'
+                'water_requirements' => 'Moderate - consistent moisture, avoid waterlogging',
             ],
             'Bell Pepper' => [
                 'moisture_min' => 55, 'moisture_max' => 75,
@@ -143,7 +142,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '70-90 days',
                 'harvest_days' => 80,
                 'optimal_conditions' => 'Warm, sunny location with moderate, consistent watering',
-                'water_requirements' => 'Moderate - consistent moisture during fruit development'
+                'water_requirements' => 'Moderate - consistent moisture during fruit development',
             ],
             'Broccoli' => [
                 'moisture_min' => 60, 'moisture_max' => 75,
@@ -156,7 +155,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '60-90 days',
                 'harvest_days' => 75,
                 'optimal_conditions' => 'Cool temperatures with consistent moisture and rich soil',
-                'water_requirements' => 'High - requires consistent moisture'
+                'water_requirements' => 'High - requires consistent moisture',
             ],
             'Cauliflower' => [
                 'moisture_min' => 65, 'moisture_max' => 80,
@@ -169,7 +168,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '70-100 days',
                 'harvest_days' => 85,
                 'optimal_conditions' => 'Cool temperatures with steady moisture',
-                'water_requirements' => 'High - consistent moisture essential'
+                'water_requirements' => 'High - consistent moisture essential',
             ],
             'Cabbage' => [
                 'moisture_min' => 65, 'moisture_max' => 80,
@@ -182,7 +181,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '80-100 days',
                 'harvest_days' => 90,
                 'optimal_conditions' => 'Cool temperatures with steady moisture and rich soil',
-                'water_requirements' => 'High - requires consistent moisture'
+                'water_requirements' => 'High - requires consistent moisture',
             ],
             'Carrots' => [
                 'moisture_min' => 50, 'moisture_max' => 70,
@@ -195,7 +194,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '70-80 days',
                 'harvest_days' => 75,
                 'optimal_conditions' => 'Deep, well-draining soil with moderate moisture',
-                'water_requirements' => 'Moderate - consistent but not excessive moisture'
+                'water_requirements' => 'Moderate - consistent but not excessive moisture',
             ],
             'Celery' => [
                 'moisture_min' => 75, 'moisture_max' => 90,
@@ -208,7 +207,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '85-120 days',
                 'harvest_days' => 103,
                 'optimal_conditions' => 'Cool, moist conditions with rich organic soil',
-                'water_requirements' => 'Very High - never allow to dry out'
+                'water_requirements' => 'Very High - never allow to dry out',
             ],
             'Chayote' => [
                 'moisture_min' => 60, 'moisture_max' => 80,
@@ -221,7 +220,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '120-150 days',
                 'harvest_days' => 135,
                 'optimal_conditions' => 'Warm, humid climate with well-draining soil',
-                'water_requirements' => 'High - consistent moisture needed'
+                'water_requirements' => 'High - consistent moisture needed',
             ],
             'Habichuelas/Baguio Beans' => [
                 'moisture_min' => 55, 'moisture_max' => 75,
@@ -234,7 +233,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '50-65 days',
                 'harvest_days' => 58,
                 'optimal_conditions' => 'Cool temperatures with moderate moisture',
-                'water_requirements' => 'Moderate - avoid overwatering'
+                'water_requirements' => 'Moderate - avoid overwatering',
             ],
             'Lettuce' => [
                 'moisture_min' => 70, 'moisture_max' => 85,
@@ -247,7 +246,7 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '45-65 days',
                 'harvest_days' => 55,
                 'optimal_conditions' => 'Cool temperatures with consistent moisture',
-                'water_requirements' => 'High - requires consistent moisture'
+                'water_requirements' => 'High - requires consistent moisture',
             ],
             'White Potato' => [
                 'moisture_min' => 45, 'moisture_max' => 65,
@@ -260,16 +259,42 @@ class CropRecommendationSeeder extends Seeder
                 'harvest_time' => '70-120 days',
                 'harvest_days' => 95,
                 'optimal_conditions' => 'Cool temperatures with well-draining soil',
-                'water_requirements' => 'Moderate - avoid overwatering to prevent rot'
-            ]
+                'water_requirements' => 'Moderate - avoid overwatering to prevent rot',
+            ],
+            'Sweet Potato' => [
+                'moisture_min' => 50, 'moisture_max' => 70,
+                'temperature_min' => 20, 'temperature_max' => 30,
+                'seasons' => ['summer'],
+                'planting_months' => [4, 5, 6, 7],
+                'favorable_weather' => ['Clear', 'Clouds'],
+                'unfavorable_weather' => ['Thunderstorm'],
+                'planting_tips' => 'Plant vine cuttings (slips) in loose, well-draining soil. Hill soil around base as vines spread.',
+                'harvest_time' => '90-120 days',
+                'harvest_days' => 105,
+                'optimal_conditions' => 'Warm, sunny climate with sandy loam soil and good drainage',
+                'water_requirements' => 'Moderate - consistent moisture but avoid waterlogging to prevent tuber rot',
+            ],
+            'Chili' => [
+                'moisture_min' => 55, 'moisture_max' => 75,
+                'temperature_min' => 22, 'temperature_max' => 32,
+                'seasons' => ['summer'],
+                'planting_months' => [4, 5, 6, 7],
+                'favorable_weather' => ['Clear', 'Clouds'],
+                'unfavorable_weather' => ['Rain', 'Thunderstorm'],
+                'planting_tips' => 'Start seeds indoors and transplant after soil warms. Provide good air circulation to reduce fungal disease.',
+                'harvest_time' => '70-90 days',
+                'harvest_days' => 80,
+                'optimal_conditions' => 'Hot, sunny location with well-draining, fertile soil',
+                'water_requirements' => 'Moderate - consistent moisture during fruit set, avoid waterlogging',
+            ],
         ];
 
         foreach ($cropData as $commodityName => $data) {
             $commodity = Commodity::where('name', $commodityName)->first();
-            
+
             if ($commodity) {
                 CropRecommendation::create(array_merge([
-                    'commodity_id' => $commodity->id
+                    'commodity_id' => $commodity->id,
                 ], $data));
             }
         }

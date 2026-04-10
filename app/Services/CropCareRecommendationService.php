@@ -214,6 +214,18 @@ class CropCareRecommendationService
                 ['start_day' => 51, 'end_day' => 80, 'action' => 'Tasseling', 'description' => 'Critical pollination period. Maintain consistent moisture and avoid stress.', 'icon' => 'wheat', 'priority' => 'high'],
                 ['start_day' => 81, 'end_day' => 120, 'action' => 'Grain Fill', 'description' => 'Kernels are developing. Continue consistent watering until maturity.', 'icon' => 'grain', 'priority' => 'medium'],
             ],
+            'sweet potato' => [
+                ['start_day' => 0, 'end_day' => 14, 'action' => 'Slip Establishment', 'description' => 'Keep slips consistently moist while roots establish. Avoid waterlogging.', 'icon' => 'sprout', 'priority' => 'high'],
+                ['start_day' => 15, 'end_day' => 50, 'action' => 'Vine Development', 'description' => 'Vines are spreading rapidly. Apply potassium-rich fertilizer to support tuber formation.', 'icon' => 'leaf', 'priority' => 'medium'],
+                ['start_day' => 51, 'end_day' => 90, 'action' => 'Tuber Bulking', 'description' => 'Tubers are actively developing underground. Maintain moderate moisture and hill soil around base.', 'icon' => 'wheat', 'priority' => 'high'],
+                ['start_day' => 91, 'end_day' => 120, 'action' => 'Maturation', 'description' => 'Tubers are maturing. Reduce watering gradually. Harvest when leaves begin to yellow.', 'icon' => 'apple', 'priority' => 'medium'],
+            ],
+            'chili' => [
+                ['start_day' => 0, 'end_day' => 14, 'action' => 'Germination Care', 'description' => 'Maintain warm soil (25-30°C) and consistent moisture. Avoid overwatering to prevent damping off.', 'icon' => 'sprout', 'priority' => 'high'],
+                ['start_day' => 15, 'end_day' => 45, 'action' => 'Seedling Development', 'description' => 'Transplant when seedlings reach 10-15 cm. Ensure good spacing for air circulation.', 'icon' => 'tree-pine', 'priority' => 'medium'],
+                ['start_day' => 46, 'end_day' => 70, 'action' => 'Flowering Stage', 'description' => 'Flowers are forming. Avoid excessive nitrogen. Ensure consistent watering for fruit set.', 'icon' => 'flower', 'priority' => 'medium'],
+                ['start_day' => 71, 'end_day' => 90, 'action' => 'Fruit Development', 'description' => 'Chilies are developing. Monitor for pests. Harvest green or allow to ripen to red.', 'icon' => 'apple', 'priority' => 'high'],
+            ],
         ];
 
         // Default stages for unknown crops
