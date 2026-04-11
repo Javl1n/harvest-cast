@@ -39,7 +39,7 @@ class PriceSeeder extends Seeder
             // 'Chayote',
             // 'Habichuelas/Baguio Beans',
             // 'Lettuce',
-            // 'White Potato',
+            'White Potato',
             // Spices
             'Chili',
             // 'Ginger',
@@ -200,4 +200,3 @@ class PriceSeeder extends Seeder
         }
     }
 }
-

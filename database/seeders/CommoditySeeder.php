@@ -33,7 +33,7 @@ class CommoditySeeder extends Seeder
             // 'Chayote',
             // 'Habichuelas/Baguio Beans',
             // 'Lettuce',
-            // 'White Potato',
+            'White Potato',
             // Spices
             'Chili',
             // 'Ginger',
